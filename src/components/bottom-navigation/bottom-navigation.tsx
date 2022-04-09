@@ -28,7 +28,11 @@ export const BottomNavigationItem: FC<BottomNavigationItemProps> = ({ to, icon, 
   );
 };
 
-export const BottomNavigation: FC = ({ children }) => {
+export interface BottomNavigationProps {
+  children: ReactElement<BottomNavigationItemProps> | ReactElement<BottomNavigationItemProps>[];
+}
+
+export const BottomNavigation: FC<BottomNavigationProps> = ({ children }) => {
   return (
     <>
       <div role="presentation" className={styles.footerClear} />

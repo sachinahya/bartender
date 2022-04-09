@@ -1,15 +1,23 @@
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { FaGlassMartini, FaSearch, FaHeart } from 'react-icons/fa';
 
 import { BottomNavigation, BottomNavigationItem } from '../../components/bottom-navigation';
 
 import * as styles from './layout.css';
 
-export const Layout: FC = ({ children }) => {
+export interface LayoutProps {
+  children?: ReactNode;
+}
+
+export const Layout: FC<LayoutProps> = ({ children }) => {
   return <div>{children}</div>;
 };
 
-export const Main: FC = ({ children }) => {
+export interface MainProps {
+  children?: ReactNode;
+}
+
+export const Main: FC<MainProps> = ({ children }) => {
   return <main className={styles.main}>{children}</main>;
 };
 
