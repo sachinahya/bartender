@@ -3,6 +3,7 @@ import { FC, HTMLAttributes } from 'react';
 
 import { Drink } from '../../data/drink';
 import { Link } from '../link';
+import { styles as linkOverlayStyles } from '../link-overlay';
 
 import * as styles from './tile.css';
 
@@ -12,7 +13,7 @@ export interface TileProps extends HTMLAttributes<HTMLElement> {
 
 export const Tile: FC<TileProps> = ({ drink, ...props }) => {
   return (
-    <article {...props} className={clsx(styles.root, props.className)}>
+    <article {...props} className={clsx(styles.root, linkOverlayStyles.linkBox, props.className)}>
       <img src={drink.image} alt={drink.name} className={styles.img} />
       <div className={styles.content}>
         <Link to={`/drink/${drink.id}`} className={styles.link}>
@@ -20,6 +21,13 @@ export const Tile: FC<TileProps> = ({ drink, ...props }) => {
         </Link>
         <div className={styles.category}>{drink.category}</div>
       </div>
+      <Link
+        aria-hidden
+        to={`/drink/${drink.id}`}
+        className={clsx(linkOverlayStyles.linkOverlay, styles.overlayLink)}
+      >
+        {drink.name}
+      </Link>
     </article>
   );
 };

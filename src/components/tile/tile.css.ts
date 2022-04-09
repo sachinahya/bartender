@@ -32,6 +32,11 @@ export const link = style({
   textDecoration: 'none',
 });
 
+export const overlayLink = style({
+  marginBlockStart: '-3em',
+  opacity: 0,
+});
+
 export const category = style({
   color: vars.colors.whiteAlpha[700],
 });
