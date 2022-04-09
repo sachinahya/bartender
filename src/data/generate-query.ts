@@ -143,7 +143,7 @@ export function generateQuery<P extends Params, K extends SimpleQueryKey, R>(
     return {};
   };
 
-  const useDataQuery: GeneratedNoParams<K, R>['useDataQuery'] = (options) => {
+  const useDataQuery: Result['useDataQuery'] = (options) => {
     const defaultQueryOptions = useDefaultQueryOptions(prefetchLoader);
 
     return useQuery(getKey(), () => fetcher(), {
