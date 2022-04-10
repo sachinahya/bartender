@@ -30,7 +30,7 @@ const fetchSingleDrink = async (url: URL): Promise<Drink> => {
 };
 
 // Get one random drink
-export const { useDataQuery: useRandomDrinkQuery, prefetchLoader: randomDrinkLoader } =
+export const { useDataQuery: useRandomDrinkQuery, prefetchLoaderFactory: randomDrinkLoader } =
   generateQuery<Drink>({
     key: 'randomDrink',
     fetcher: () => {
@@ -45,7 +45,7 @@ export const { useDataQuery: useRandomDrinkQuery, prefetchLoader: randomDrinkLoa
   });
 
 // Get list of random drinks
-export const { useDataQuery: useRandomDrinksQuery, prefetchLoader: randomDrinksLoader } =
+export const { useDataQuery: useRandomDrinksQuery, prefetchLoaderFactory: randomDrinksLoader } =
   generateQuery<Drink[]>({
     key: 'randomDrinks',
     fetcher: () => {
@@ -65,7 +65,7 @@ export const { useDataQuery: useRandomDrinksQuery, prefetchLoader: randomDrinksL
 export const {
   useDataQuery: useDrinkQuery,
   useRouteMatchedDataQuery: useMatchedDrinkQuery,
-  prefetchLoader: drinkByIdLoader,
+  prefetchLoaderFactory: drinkByIdLoader,
 } = generateQuery<{ id: string }, Drink>({
   key: 'drink',
   fetcher:
@@ -81,7 +81,7 @@ export const {
   },
 });
 
-export const { useDataQuery: useFavouriteDrinks, prefetchLoader: favouriteDrinksLoader } =
+export const { useDataQuery: useFavouriteDrinks, prefetchLoaderFactory: favouriteDrinksLoader } =
   generateQuery<Drink[]>({
     key: 'favouriteDrinks',
     fetcher: () => {

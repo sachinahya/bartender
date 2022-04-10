@@ -1,13 +1,14 @@
 import { Route } from '@tanstack/react-location';
+import { QueryClient } from 'react-query';
 
 import { randomDrinkLoader, randomDrinksLoader, drinkByIdLoader } from './data/drink';
 import { Discover } from './views/discover';
 
-export const routes: Route[] = [
+export const createRoutes = (queryClient: QueryClient): Route[] => [
   {
     path: '/',
     element: <Discover />,
-    loader: randomDrinksLoader,
+    loader: randomDrinksLoader(queryClient),
   },
   {
     path: 'favourites',
@@ -19,12 +20,12 @@ export const routes: Route[] = [
       {
         path: 'random',
         element: () => import('./views/drink').then(({ Drink }) => <Drink />),
-        loader: randomDrinkLoader,
+        loader: randomDrinkLoader(queryClient),
       },
       {
         path: ':id',
         element: () => import('./views/drink').then(({ Drink }) => <Drink />),
-        loader: drinkByIdLoader,
+        loader: drinkByIdLoader(queryClient),
       },
     ],
   },

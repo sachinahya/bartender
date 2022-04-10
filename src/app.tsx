@@ -1,10 +1,13 @@
-import { Outlet, Router } from '@tanstack/react-location';
+import { Outlet, ReactLocation, Router } from '@tanstack/react-location';
 import { FC } from 'react';
-import { QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
-import { location, queryClient } from './data/client';
-import { routes } from './routes';
+import { createRoutes } from './routes';
+
+const queryClient = new QueryClient();
+const location = new ReactLocation();
+const routes = createRoutes(queryClient);
 
 export const App: FC = () => (
   <QueryClientProvider client={queryClient}>

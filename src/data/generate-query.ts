@@ -1,14 +1,15 @@
 import { LoaderFn, RouteMatch, useMatch } from '@tanstack/react-location';
+import memoizeOne from 'memoize-one';
 import {
   FetchQueryOptions,
+  QueryClient,
   QueryFunction,
   useQuery,
+  useQueryClient,
   UseQueryOptions,
   UseQueryResult,
 } from 'react-query';
 import type { Except } from 'type-fest';
-
-import { queryClient } from './client';
 
 export type Params = unknown;
 
@@ -54,7 +55,7 @@ export interface GeneratedNoParams<R> {
   getKey: () => SimpleQueryKey;
   // fetchData: () => Promise<R>;
   useDataQuery: (options?: UseDataQueryOptions<SimpleQueryKey, R>) => UseQueryResult<R, Error>;
-  prefetchLoader: LoaderFn;
+  prefetchLoaderFactory: (queryClient: QueryClient) => LoaderFn;
 }
 
 export interface GeneratedWithParams<P extends Params, R> {
@@ -67,15 +68,17 @@ export interface GeneratedWithParams<P extends Params, R> {
   useRouteMatchedDataQuery: (
     options?: UseDataQueryOptions<ParameterizedQueryKey<P>, R>,
   ) => UseQueryResult<R, Error>;
-  prefetchLoader: LoaderFn;
+  prefetchLoaderFactory: (queryClient: QueryClient) => LoaderFn;
 }
 
-const useDefaultQueryOptions = (prefetchLoader: LoaderFn) => {
+const useDefaultQueryOptions = (prefetchLoaderFactory: (queryClient: QueryClient) => LoaderFn) => {
+  const queryClient = useQueryClient();
   const { route } = useMatch();
 
   return {
     // Don't refetch on mount if the data was already provided by a loader.
-    refetchOnMount: route.loader === prefetchLoader ? false : undefined,
+    // The prefetchLoaderFactory's return needs to be memoized for this equality check to work.
+    refetchOnMount: route.loader === prefetchLoaderFactory(queryClient) ? false : undefined,
   };
 };
 
@@ -94,21 +97,23 @@ export function generateQuery<P extends Params, R>(
 
     const getKey: Result['getKey'] = (params) => [key, params];
 
-    const prefetchLoader: Result['prefetchLoader'] = async (match) => {
-      const params = getMatchParams(match);
+    const prefetchLoaderFactory = memoizeOne<Result['prefetchLoaderFactory']>(
+      (queryClient) => async (match) => {
+        const params = getMatchParams(match);
 
-      if (params) {
-        await queryClient.prefetchQuery(getKey(params), fetcher(params), {
-          ...commonOptions,
-          ...loaderOptions,
-        });
-      }
+        if (params) {
+          await queryClient.prefetchQuery(getKey(params), fetcher(params), {
+            ...commonOptions,
+            ...loaderOptions,
+          });
+        }
 
-      return {};
-    };
+        return {};
+      },
+    );
 
     const useDataQuery: Result['useDataQuery'] = (params, options) => {
-      const defaultOptions = useDefaultQueryOptions(prefetchLoader);
+      const defaultOptions = useDefaultQueryOptions(prefetchLoaderFactory);
 
       return useQuery(getKey(params), fetcher(params), {
         ...defaultOptions,
@@ -125,7 +130,7 @@ export function generateQuery<P extends Params, R>(
 
     return {
       getKey,
-      prefetchLoader,
+      prefetchLoaderFactory,
       useDataQuery,
       useRouteMatchedDataQuery,
     };
@@ -136,16 +141,18 @@ export function generateQuery<P extends Params, R>(
 
   const getKey: Result['getKey'] = () => [key];
 
-  const prefetchLoader: Result['prefetchLoader'] = async () => {
-    await queryClient.prefetchQuery(getKey(), fetcher, {
-      ...commonOptions,
-      ...loaderOptions,
-    });
-    return {};
-  };
+  const prefetchLoaderFactory = memoizeOne<Result['prefetchLoaderFactory']>(
+    (queryClient) => async () => {
+      await queryClient.prefetchQuery(getKey(), fetcher, {
+        ...commonOptions,
+        ...loaderOptions,
+      });
+      return {};
+    },
+  );
 
   const useDataQuery: Result['useDataQuery'] = (options) => {
-    const defaultQueryOptions = useDefaultQueryOptions(prefetchLoader);
+    const defaultQueryOptions = useDefaultQueryOptions(prefetchLoaderFactory);
 
     return useQuery(getKey(), fetcher, {
       ...defaultQueryOptions,
@@ -156,7 +163,7 @@ export function generateQuery<P extends Params, R>(
 
   return {
     getKey,
-    prefetchLoader,
+    prefetchLoaderFactory,
     useDataQuery,
   };
 }
