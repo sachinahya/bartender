@@ -1,67 +1,71 @@
 import { LoaderFn, RouteMatch, useMatch } from '@tanstack/react-location';
-import { FetchQueryOptions, useQuery, UseQueryOptions, UseQueryResult } from 'react-query';
+import {
+  FetchQueryOptions,
+  QueryFunction,
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+} from 'react-query';
 import type { Except } from 'type-fest';
 
 import { queryClient } from './client';
 
-type Params = unknown;
+export type Params = unknown;
 
-type SimpleQueryKey<K extends string = string> = K;
+export type KeyId = string;
 
-type ParameterizedQueryKey<P extends Params, K extends SimpleQueryKey = SimpleQueryKey> = Readonly<
-  [K, P]
->;
+export type SimpleQueryKey = readonly [KeyId];
 
-type UseDataQueryOptions<
-  K extends SimpleQueryKey | ParameterizedQueryKey<Params, SimpleQueryKey>,
+export type ParameterizedQueryKey<P extends Params> = readonly [KeyId, P];
+
+export type UseDataQueryOptions<
+  K extends SimpleQueryKey | ParameterizedQueryKey<Params>,
   R,
 > = Except<UseQueryOptions<R, Error, R, K>, 'queryKey' | 'queryFn'>;
 
-type FetchDataOptions<
-  K extends SimpleQueryKey | ParameterizedQueryKey<Params, SimpleQueryKey>,
+export type FetchDataOptions<
+  K extends SimpleQueryKey | ParameterizedQueryKey<Params>,
   R,
 > = FetchQueryOptions<R, Error, R, K>;
 
-type CommonDataOptions<
-  K extends SimpleQueryKey | ParameterizedQueryKey<Params, SimpleQueryKey>,
-  R,
-> = UseDataQueryOptions<K, R> | FetchDataOptions<K, R>;
+export type CommonDataOptions<K extends SimpleQueryKey | ParameterizedQueryKey<Params>, R> =
+  | UseDataQueryOptions<K, R>
+  | FetchDataOptions<K, R>;
 
-interface CommonGenerateQueryOptions<K extends SimpleQueryKey> {
-  key: K;
+export interface CommonGenerateQueryOptions {
+  key: KeyId;
 }
 
-interface GenerateQueryOptionsNoParams<K extends SimpleQueryKey, R>
-  extends CommonGenerateQueryOptions<K> {
-  fetcher: () => Promise<R>;
-  commonOptions?: CommonDataOptions<K, R>;
-  loaderOptions?: FetchDataOptions<K, R>;
+export interface GenerateQueryOptionsNoParams<R> extends CommonGenerateQueryOptions {
+  fetcher: QueryFunction<R, SimpleQueryKey>;
+  commonOptions?: CommonDataOptions<SimpleQueryKey, R>;
+  loaderOptions?: FetchDataOptions<SimpleQueryKey, R>;
 }
 
-interface GenerateQueryOptionsWithParams<P extends Params, K extends SimpleQueryKey, R>
-  extends CommonGenerateQueryOptions<K> {
-  fetcher: (params: P) => Promise<R>;
+export interface GenerateQueryOptionsWithParams<P extends Params, R>
+  extends CommonGenerateQueryOptions {
+  fetcher: (params: P) => QueryFunction<R, ParameterizedQueryKey<P>>;
   getMatchParams: (routeMatch: RouteMatch) => Readonly<P> | null;
-  commonOptions?: CommonDataOptions<ParameterizedQueryKey<P, K>, R>;
-  loaderOptions?: FetchDataOptions<ParameterizedQueryKey<P, K>, R>;
+  commonOptions?: CommonDataOptions<ParameterizedQueryKey<P>, R>;
+  loaderOptions?: FetchDataOptions<ParameterizedQueryKey<P>, R>;
 }
 
-interface GeneratedNoParams<K extends SimpleQueryKey, R> {
-  getKey: () => K;
-  fetchData: () => Promise<R>;
-  useDataQuery: (options?: UseDataQueryOptions<SimpleQueryKey<K>, R>) => UseQueryResult<R, Error>;
+export interface GeneratedNoParams<R> {
+  getKey: () => SimpleQueryKey;
+  // fetchData: () => Promise<R>;
+  useDataQuery: (options?: UseDataQueryOptions<SimpleQueryKey, R>) => UseQueryResult<R, Error>;
   prefetchLoader: LoaderFn;
 }
 
-interface GeneratedWithParams<P extends Params, K extends SimpleQueryKey, R> {
-  getKey: (params: P) => ParameterizedQueryKey<P, K>;
-  fetchData: (params: P) => Promise<R>;
+export interface GeneratedWithParams<P extends Params, R> {
+  getKey: (params: P) => ParameterizedQueryKey<P>;
+  // fetchData: (params: P) => Promise<R>;
   useDataQuery: (
     params: P,
-    options?: UseDataQueryOptions<ParameterizedQueryKey<P, K>, R>,
+    options?: UseDataQueryOptions<ParameterizedQueryKey<P>, R>,
   ) => UseQueryResult<R, Error>;
   useRouteMatchedDataQuery: (
-    options?: UseDataQueryOptions<ParameterizedQueryKey<P, K>, R>,
+    options?: UseDataQueryOptions<ParameterizedQueryKey<P>, R>,
   ) => UseQueryResult<R, Error>;
   prefetchLoader: LoaderFn;
 }
@@ -75,28 +79,26 @@ const useDefaultQueryOptions = (prefetchLoader: LoaderFn) => {
   };
 };
 
-export function generateQuery<K extends SimpleQueryKey, R>(
-  options: GenerateQueryOptionsNoParams<K, R>,
-): GeneratedNoParams<K, R>;
-export function generateQuery<P extends Params, K extends SimpleQueryKey, R>(
-  options: GenerateQueryOptionsWithParams<P, K, R>,
-): GeneratedWithParams<P, K, R>;
-export function generateQuery<P extends Params, K extends SimpleQueryKey, R>(
-  options: GenerateQueryOptionsNoParams<K, R> | GenerateQueryOptionsWithParams<P, K, R>,
-): GeneratedNoParams<K, R> | GeneratedWithParams<P, K, R> {
+export function generateQuery<R>(options: GenerateQueryOptionsNoParams<R>): GeneratedNoParams<R>;
+export function generateQuery<P extends Params, R>(
+  options: GenerateQueryOptionsWithParams<P, R>,
+): GeneratedWithParams<P, R>;
+export function generateQuery<P extends Params, R>(
+  options: GenerateQueryOptionsNoParams<R> | GenerateQueryOptionsWithParams<P, R>,
+): GeneratedNoParams<R> | GeneratedWithParams<P, R> {
   // Empty comment so Prettier keeps spacing.
 
   if ('getMatchParams' in options) {
-    type Result = GeneratedWithParams<P, K, R>;
+    type Result = GeneratedWithParams<P, R>;
     const { key, fetcher, getMatchParams, commonOptions, loaderOptions } = options;
 
-    const getKey = (params: P): ParameterizedQueryKey<P, K> => [key, params];
+    const getKey: Result['getKey'] = (params) => [key, params];
 
     const prefetchLoader: Result['prefetchLoader'] = async (match) => {
       const params = getMatchParams(match);
 
       if (params) {
-        await queryClient.prefetchQuery(getKey(params), () => fetcher(params), {
+        await queryClient.prefetchQuery(getKey(params), fetcher(params), {
           ...commonOptions,
           ...loaderOptions,
         });
@@ -108,7 +110,7 @@ export function generateQuery<P extends Params, K extends SimpleQueryKey, R>(
     const useDataQuery: Result['useDataQuery'] = (params, options) => {
       const defaultOptions = useDefaultQueryOptions(prefetchLoader);
 
-      return useQuery(getKey(params), () => fetcher(params), {
+      return useQuery(getKey(params), fetcher(params), {
         ...defaultOptions,
         ...commonOptions,
         ...options,
@@ -123,20 +125,19 @@ export function generateQuery<P extends Params, K extends SimpleQueryKey, R>(
 
     return {
       getKey,
-      fetchData: fetcher,
       prefetchLoader,
       useDataQuery,
       useRouteMatchedDataQuery,
     };
   }
 
-  type Result = GeneratedNoParams<K, R>;
+  type Result = GeneratedNoParams<R>;
   const { key, fetcher, commonOptions, loaderOptions } = options;
 
-  const getKey = (): SimpleQueryKey<K> => key;
+  const getKey: Result['getKey'] = () => [key];
 
   const prefetchLoader: Result['prefetchLoader'] = async () => {
-    await queryClient.prefetchQuery(getKey(), () => fetcher(), {
+    await queryClient.prefetchQuery(getKey(), fetcher, {
       ...commonOptions,
       ...loaderOptions,
     });
@@ -146,7 +147,7 @@ export function generateQuery<P extends Params, K extends SimpleQueryKey, R>(
   const useDataQuery: Result['useDataQuery'] = (options) => {
     const defaultQueryOptions = useDefaultQueryOptions(prefetchLoader);
 
-    return useQuery(getKey(), () => fetcher(), {
+    return useQuery(getKey(), fetcher, {
       ...defaultQueryOptions,
       ...commonOptions,
       ...options,
@@ -155,7 +156,6 @@ export function generateQuery<P extends Params, K extends SimpleQueryKey, R>(
 
   return {
     getKey,
-    fetchData: fetcher,
     prefetchLoader,
     useDataQuery,
   };

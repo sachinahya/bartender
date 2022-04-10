@@ -31,9 +31,9 @@ const fetchSingleDrink = async (url: URL): Promise<Drink> => {
 
 // Get one random drink
 export const { useDataQuery: useRandomDrinkQuery, prefetchLoader: randomDrinkLoader } =
-  generateQuery({
+  generateQuery<Drink>({
     key: 'randomDrink',
-    fetcher: (): Promise<Drink> => {
+    fetcher: () => {
       const url = getBaseUrl(TOKEN);
       url.pathname += '/random.php';
       return fetchSingleDrink(url);
@@ -46,9 +46,9 @@ export const { useDataQuery: useRandomDrinkQuery, prefetchLoader: randomDrinkLoa
 
 // Get list of random drinks
 export const { useDataQuery: useRandomDrinksQuery, prefetchLoader: randomDrinksLoader } =
-  generateQuery({
+  generateQuery<Drink[]>({
     key: 'randomDrinks',
-    fetcher: (): Promise<Drink[]> => {
+    fetcher: () => {
       const url = getBaseUrl(TOKEN);
       url.pathname += '/random.php';
 
@@ -66,13 +66,15 @@ export const {
   useDataQuery: useDrinkQuery,
   useRouteMatchedDataQuery: useMatchedDrinkQuery,
   prefetchLoader: drinkByIdLoader,
-} = generateQuery({
+} = generateQuery<{ id: string }, Drink>({
   key: 'drink',
-  fetcher: ({ id }: { id: string }): Promise<Drink> => {
-    const url = getLookupUrl(TOKEN);
-    url.searchParams.set('i', id);
-    return fetchSingleDrink(url);
-  },
+  fetcher:
+    ({ id }) =>
+    () => {
+      const url = getLookupUrl(TOKEN);
+      url.searchParams.set('i', id);
+      return fetchSingleDrink(url);
+    },
   getMatchParams: (routeMatch) => (routeMatch.params.id ? { id: routeMatch.params.id } : null),
   loaderOptions: {
     staleTime: 10_000,
@@ -80,9 +82,9 @@ export const {
 });
 
 export const { useDataQuery: useFavouriteDrinks, prefetchLoader: favouriteDrinksLoader } =
-  generateQuery({
+  generateQuery<Drink[]>({
     key: 'favouriteDrinks',
-    fetcher: (): Promise<Drink[]> => {
+    fetcher: () => {
       return favouritesStore.getAll();
     },
   });
