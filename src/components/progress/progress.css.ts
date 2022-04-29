@@ -19,7 +19,7 @@ export const spinner = style({
   display: 'inline-block',
   width: '1em',
   height: '1em',
-  border: '2px solid currentColor',
+  border: '0.15em solid currentColor',
   borderBottomColor: 'transparent',
   borderRadius: vars.radii.full,
   animation: `${spinnerAnim} 0.75s 0s infinite linear`,

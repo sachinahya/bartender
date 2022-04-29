@@ -102,7 +102,7 @@ export function generateQuery<P extends Params, R>(
         const params = getMatchParams(match);
 
         if (params) {
-          await queryClient.prefetchQuery(getKey(params), fetcher(params), {
+          await queryClient.prefetchQuery(getKey(params), (context) => fetcher(params)(context), {
             ...commonOptions,
             ...loaderOptions,
           });
@@ -115,7 +115,7 @@ export function generateQuery<P extends Params, R>(
     const useDataQuery: Result['useDataQuery'] = (params, options) => {
       const defaultOptions = useDefaultQueryOptions(prefetchLoaderFactory);
 
-      return useQuery(getKey(params), fetcher(params), {
+      return useQuery(getKey(params), (context) => fetcher(params)(context), {
         ...defaultOptions,
         ...commonOptions,
         ...options,
@@ -143,7 +143,7 @@ export function generateQuery<P extends Params, R>(
 
   const prefetchLoaderFactory = memoizeOne<Result['prefetchLoaderFactory']>(
     (queryClient) => async () => {
-      await queryClient.prefetchQuery(getKey(), fetcher, {
+      await queryClient.prefetchQuery(getKey(), (context) => fetcher(context), {
         ...commonOptions,
         ...loaderOptions,
       });
@@ -154,7 +154,7 @@ export function generateQuery<P extends Params, R>(
   const useDataQuery: Result['useDataQuery'] = (options) => {
     const defaultQueryOptions = useDefaultQueryOptions(prefetchLoaderFactory);
 
-    return useQuery(getKey(), fetcher, {
+    return useQuery(getKey(), (context) => fetcher(context), {
       ...defaultQueryOptions,
       ...commonOptions,
       ...options,
