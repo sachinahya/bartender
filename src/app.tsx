@@ -27,7 +27,9 @@ export const App: FC = () => (
       defaultPendingElement={<LoadingView />}
       defaultPendingMs={1000}
       defaultPendingMinMs={500}
+      defaultErrorElement={<ErrorMessage />}
     >
+      {/* @ts-expect-error -- Properties are optional in ErrorMessage. */}
       <ErrorBoundary FallbackComponent={ErrorMessage}>
         <Suspense fallback={<LoadingView />}>
           <Outlet />

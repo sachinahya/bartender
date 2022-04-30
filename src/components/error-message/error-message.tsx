@@ -1,10 +1,12 @@
 import { FC } from 'react';
-import { FallbackProps } from 'react-error-boundary';
 
 import { Button } from '../button';
 import { Heading } from '../heading';
 
-export interface ErrorMessageProps extends FallbackProps {}
+export interface ErrorMessageProps {
+  error?: Error;
+  resetErrorBoundary?: (...args: unknown[]) => void;
+}
 
 export const ErrorMessage: FC<ErrorMessageProps> = ({ error, resetErrorBoundary }) => {
   return (

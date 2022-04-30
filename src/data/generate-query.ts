@@ -3,7 +3,8 @@ import memoizeOne from 'memoize-one';
 import {
   FetchQueryOptions,
   QueryClient,
-  QueryFunction,
+  QueryFunctionContext,
+  QueryFunctionData,
   useQuery,
   useQueryClient,
   UseQueryOptions,
@@ -38,14 +39,17 @@ export interface CommonGenerateQueryOptions {
 }
 
 export interface GenerateQueryOptionsNoParams<R> extends CommonGenerateQueryOptions {
-  fetcher: QueryFunction<R, SimpleQueryKey>;
+  fetcher: (context: QueryFunctionContext<SimpleQueryKey>) => Promise<QueryFunctionData<R>>;
   commonOptions?: CommonDataOptions<SimpleQueryKey, R>;
   loaderOptions?: FetchDataOptions<SimpleQueryKey, R>;
 }
 
 export interface GenerateQueryOptionsWithParams<P extends Params, R>
   extends CommonGenerateQueryOptions {
-  fetcher: (params: P) => QueryFunction<R, ParameterizedQueryKey<P>>;
+  fetcher: (
+    params: P,
+    context: QueryFunctionContext<ParameterizedQueryKey<P>>,
+  ) => Promise<QueryFunctionData<R>>;
   getMatchParams: (routeMatch: RouteMatch) => Readonly<P> | null;
   commonOptions?: CommonDataOptions<ParameterizedQueryKey<P>, R>;
   loaderOptions?: FetchDataOptions<ParameterizedQueryKey<P>, R>;
@@ -102,7 +106,7 @@ export function generateQuery<P extends Params, R>(
         const params = getMatchParams(match);
 
         if (params) {
-          await queryClient.prefetchQuery(getKey(params), (context) => fetcher(params)(context), {
+          await queryClient.prefetchQuery(getKey(params), (context) => fetcher(params, context), {
             ...commonOptions,
             ...loaderOptions,
           });
@@ -115,7 +119,7 @@ export function generateQuery<P extends Params, R>(
     const useDataQuery: Result['useDataQuery'] = (params, options) => {
       const defaultOptions = useDefaultQueryOptions(prefetchLoaderFactory);
 
-      return useQuery(getKey(params), (context) => fetcher(params)(context), {
+      return useQuery(getKey(params), (context) => fetcher(params, context), {
         ...defaultOptions,
         ...commonOptions,
         ...options,

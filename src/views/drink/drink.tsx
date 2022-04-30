@@ -1,28 +1,21 @@
 import { useMatch } from '@tanstack/react-location';
 import { FC } from 'react';
-import { FaHeart } from 'react-icons/fa';
 import mergeRefs from 'react-merge-refs';
 
 import {
   Banner,
-  BannerAction,
   BannerBackAction,
   BannerOverflowMenu,
   BannerOverflowMenuItem,
   BannerTitle,
 } from '../../components/banner';
 import { Heading } from '../../components/heading';
-import { IconButton } from '../../components/icon-button';
 import { Footer, Layout, Main } from '../../components/layout';
-import {
-  Drink as DrinkType,
-  useRandomDrinkQuery,
-  useMatchedDrinkQuery,
-  useSaveFavouriteDrink,
-} from '../../data/drink';
+import { Drink as DrinkType, useRandomDrinkQuery, useMatchedDrinkQuery } from '../../data/drink';
 import { useCallbackRef, usePalette, useParallax } from '../../utils';
 import { defineVar } from '../../utils/styles';
 
+import { FavouriteBannerAction } from './components/favourite-banner-action';
 import * as styles from './drink.css';
 
 export const Drink: FC = () => {
@@ -33,8 +26,6 @@ export const Drink: FC = () => {
   const { data: randomDrink } = useRandomDrinkQuery({
     enabled: isRandomDrinkView,
   });
-
-  const mutation = useSaveFavouriteDrink();
 
   const drinkNoPalette = drinkById || randomDrink;
 
@@ -47,20 +38,12 @@ export const Drink: FC = () => {
     ? { ...drinkNoPalette, palette: palette.palette || {} }
     : undefined;
 
-  const handleFavourite = () => {
-    if (drink) {
-      mutation.mutate(drink);
-    }
-  };
-
   return (
     <Layout>
       <Banner variant="thin">
         <BannerBackAction />
         <BannerTitle />
-        <BannerAction>
-          <FaHeart />
-        </BannerAction>
+        {drink && <FavouriteBannerAction drink={drink} />}
         <BannerOverflowMenu>
           <BannerOverflowMenuItem>Delete</BannerOverflowMenuItem>
         </BannerOverflowMenu>
@@ -78,9 +61,6 @@ export const Drink: FC = () => {
               <Heading level="h1" variant="h1" className={styles.drinkName}>
                 {drink.name}
               </Heading>
-              <IconButton onClick={handleFavourite} aria-label="Add favourite">
-                <FaHeart />
-              </IconButton>
             </header>
 
             <img

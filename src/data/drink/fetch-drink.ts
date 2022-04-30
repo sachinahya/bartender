@@ -1,9 +1,6 @@
-import { useMutation } from 'react-query';
-
 import { fetchJson } from '../fetch-json';
 import { generateQuery } from '../generate-query';
 
-import * as favouritesStore from './favourites-store';
 import { responseToEntity } from './mapping';
 import { Drink, DrinksResponse } from './types';
 
@@ -68,30 +65,13 @@ export const {
   prefetchLoaderFactory: drinkByIdLoader,
 } = generateQuery<{ id: string }, Drink>({
   key: 'drink',
-  fetcher:
-    ({ id }) =>
-    () => {
-      const url = getLookupUrl(TOKEN);
-      url.searchParams.set('i', id);
-      return fetchSingleDrink(url);
-    },
+  fetcher: ({ id }) => {
+    const url = getLookupUrl(TOKEN);
+    url.searchParams.set('i', id);
+    return fetchSingleDrink(url);
+  },
   getMatchParams: (routeMatch) => (routeMatch.params.id ? { id: routeMatch.params.id } : null),
   loaderOptions: {
     staleTime: 10_000,
   },
 });
-
-export const { useDataQuery: useFavouriteDrinks, prefetchLoaderFactory: favouriteDrinksLoader } =
-  generateQuery<Drink[]>({
-    key: 'favouriteDrinks',
-    fetcher: () => {
-      return favouritesStore.getAll();
-    },
-  });
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types -- TODO: Define this.
-export const useSaveFavouriteDrink = () => {
-  return useMutation((newDrink: Drink) => {
-    return favouritesStore.add(newDrink);
-  });
-};

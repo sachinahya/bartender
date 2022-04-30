@@ -91,7 +91,7 @@ export const colourVariants = styleVariants({
         [localVars.backgroundColor]: 'transparent',
         [localVars.color]: vars.colors.brand[600],
 
-        [localVars.hover.backgroundColor]: vars.colors.brand[100],
+        [localVars.hover.backgroundColor]: 'transparent',
         [localVars.hover.color]: vars.colors.brand[600],
 
         [localVars.focus.color]: vars.colors.brand[300],
