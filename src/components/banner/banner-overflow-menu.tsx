@@ -10,6 +10,7 @@ export interface BannerOverflowMenuProps extends Partial<MenuProps> {}
 export const BannerOverflowMenu: FC<BannerOverflowMenuProps> = (props) => {
   return (
     <Menu
+      aria-label="Overflow"
       button={
         <MenuButton aria-label="More" variant="minimal" className={styles.bannerAction}>
           <FaEllipsisV />

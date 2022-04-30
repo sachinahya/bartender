@@ -58,20 +58,20 @@ export const MenuItem: FC<MenuItemProps> = (props) => {
   );
 };
 
-export interface MenuProps {
+export interface MenuProps extends HTMLAttributes<HTMLElement> {
   button: ReactElement<MenuButtonProps>;
   children?:
     | (boolean | null | ReactElement<MenuItemProps>)
     | (boolean | null | ReactElement<MenuItemProps>)[];
 }
 
-export const Menu: FC<MenuProps> = ({ button, children }) => {
+export const Menu: FC<MenuProps> = ({ button, children, ...props }) => {
   const menu = useMenuState({ animated: styles.ANIMATION_DURATION_MS });
 
   return (
     <MenuContext.Provider value={menu}>
       {button}
-      <ReakitMenu {...menu}>
+      <ReakitMenu {...props} {...menu}>
         <div className={styles.items}>
           {Children.map(children, (child) =>
             isValidElement<MenuItemProps>(child)
