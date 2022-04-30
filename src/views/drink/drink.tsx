@@ -3,8 +3,16 @@ import { FC } from 'react';
 import { FaHeart } from 'react-icons/fa';
 import mergeRefs from 'react-merge-refs';
 
-import { Button } from '../../components/button';
+import {
+  Banner,
+  BannerAction,
+  BannerBackAction,
+  BannerOverflowMenu,
+  BannerOverflowMenuItem,
+  BannerTitle,
+} from '../../components/banner';
 import { Heading } from '../../components/heading';
+import { IconButton } from '../../components/icon-button';
 import { Footer, Layout, Main } from '../../components/layout';
 import {
   Drink as DrinkType,
@@ -47,6 +55,16 @@ export const Drink: FC = () => {
 
   return (
     <Layout>
+      <Banner variant="thin">
+        <BannerBackAction />
+        <BannerTitle />
+        <BannerAction>
+          <FaHeart />
+        </BannerAction>
+        <BannerOverflowMenu>
+          <BannerOverflowMenuItem>Delete</BannerOverflowMenuItem>
+        </BannerOverflowMenu>
+      </Banner>
       <Main>
         {drink ? (
           <article
@@ -57,12 +75,12 @@ export const Drink: FC = () => {
             }}
           >
             <header className={styles.header}>
-              <Heading level="h2" variant="h1" className={styles.drinkName}>
+              <Heading level="h1" variant="h1" className={styles.drinkName}>
                 {drink.name}
               </Heading>
-              <Button onClick={handleFavourite}>
+              <IconButton onClick={handleFavourite} aria-label="Add favourite">
                 <FaHeart />
-              </Button>
+              </IconButton>
             </header>
 
             <img

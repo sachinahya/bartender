@@ -1,8 +1,8 @@
-import { style } from '@vanilla-extract/css';
+import { style, styleVariants } from '@vanilla-extract/css';
 
 import { breakpoints, vars } from '../../theme';
 
-export const banner = style({
+export const bannerBase = style({
   display: 'flex',
   alignItems: 'center',
   blockSize: vars.sizes[12],
@@ -11,6 +11,23 @@ export const banner = style({
   insetInline: 0,
   insetBlockStart: 0,
   zIndex: vars.zIndices.banner,
+});
+
+export const banner = styleVariants({
+  heavy: [
+    bannerBase,
+    {
+      backgroundColor: vars.colors.brand[500],
+      color: vars.colors.white,
+    },
+  ],
+  thin: [
+    bannerBase,
+    {
+      backgroundImage: `linear-gradient(to bottom, ${vars.colors.blackAlpha[700]}, transparent)`,
+      color: vars.colors.white,
+    },
+  ],
 });
 
 export const bannerClear = style({
@@ -26,7 +43,10 @@ export const bannerClear = style({
 export const bannerTitle = style({
   flexGrow: 1,
   marginInline: vars.space[2],
-  color: vars.colors.brand[600],
   overflow: 'hidden',
   textOverflow: 'ellipsis',
+});
+
+export const bannerAction = style({
+  color: 'inherit',
 });

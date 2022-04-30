@@ -1,11 +1,14 @@
+import clsx from 'clsx';
 import { FC, HTMLAttributes } from 'react';
 
-import { banner } from './banner.css';
+import * as styles from './banner.css';
 
-export interface BannerProps extends HTMLAttributes<HTMLElement> {}
+export interface BannerProps extends HTMLAttributes<HTMLElement> {
+  variant?: keyof typeof styles.banner;
+}
 
-export const BANNER_BLOCK_SIZE = [12, null, 16];
-
-export const Banner: FC<BannerProps> = (props) => {
-  return <header role="banner" className={banner} {...props} />;
+export const Banner: FC<BannerProps> = ({ variant = 'heavy', ...props }) => {
+  return (
+    <header role="banner" {...props} className={clsx(styles.banner[variant], props.className)} />
+  );
 };

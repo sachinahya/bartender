@@ -1,45 +1,39 @@
 import clsx from 'clsx';
-import { ButtonHTMLAttributes, forwardRef, ReactElement, ReactNode } from 'react';
-import { Button as ReakitButton } from 'reakit';
+import { cloneElement, forwardRef, ReactElement, ReactNode, SVGAttributes } from 'react';
 
+import { ButtonBase, ButtonBaseProps } from '../button-base';
 import { Progress } from '../progress';
 
 import * as styles from './button.css';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: keyof typeof styles.button;
-  buttonSize?: keyof typeof styles.size;
-  icon?: ReactElement;
-  loading?: boolean;
+export interface ButtonProps extends ButtonBaseProps {
+  icon?: ReactElement<SVGAttributes<SVGElement>>;
   loadingContent?: ReactNode;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  {
-    children,
-    variant = 'primary',
-    buttonSize = 'normal',
-    icon,
-    loading,
-    loadingContent = children,
-    disabled,
-    ...props
-  },
+  { children, variant, buttonSize, loading, icon, loadingContent = children, disabled, ...props },
   ref,
 ) {
-  const isDisabled = loading || disabled;
+  const iconElement = icon
+    ? cloneElement(icon, { className: clsx(styles.icon, icon.props.className) })
+    : undefined;
 
   return (
-    <ReakitButton
-      ref={ref}
+    <ButtonBase
       {...props}
-      className={clsx(styles.button[variant], styles.size[buttonSize], props.className)}
-      disabled={isDisabled}
+      ref={ref}
+      className={clsx(styles.button, props.className)}
+      loading={loading}
+      variant={variant}
+      buttonSize={buttonSize}
     >
-      <span className={clsx(!icon && styles.progressOverlay)}>{loading ? <Progress /> : icon}</span>
-      <span className={clsx(styles.inner, loading && !icon && styles.textProgressNoIcon)}>
+      <span className={clsx(!iconElement && styles.progressOverlay)}>
+        {loading ? <Progress /> : iconElement}
+      </span>
+      <span className={clsx(styles.inner, loading && !iconElement && styles.textProgressNoIcon)}>
         {loading ? loadingContent : children}
       </span>
-    </ReakitButton>
+    </ButtonBase>
   );
 });

@@ -1,11 +1,12 @@
 import clsx from 'clsx';
-import { FC, HTMLAttributes } from 'react';
+import { FC } from 'react';
+import type { Except } from 'type-fest';
 
-import { Heading } from '../heading';
+import { Heading, HeadingProps } from '../heading';
 
 import { bannerTitle } from './banner.css';
 
-export interface BannerTitleProps extends HTMLAttributes<HTMLHeadingElement> {}
+export interface BannerTitleProps extends Except<HeadingProps, 'level'> {}
 
 export const BannerTitle: FC<BannerTitleProps> = (props) => {
   return (

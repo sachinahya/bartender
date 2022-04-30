@@ -1,10 +1,9 @@
 import { FC } from 'react';
 import { FaChevronLeft } from 'react-icons/fa';
-import type { Except } from 'type-fest';
 
 import { BannerAction, BannerActionProps } from './banner-action';
 
-export interface BannerBackActionProps extends Except<BannerActionProps, 'aria-label'> {
+export interface BannerBackActionProps extends Partial<BannerActionProps> {
   'aria-label'?: string;
 }
 

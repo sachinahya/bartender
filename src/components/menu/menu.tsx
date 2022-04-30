@@ -17,7 +17,7 @@ import {
   useMenuState,
 } from 'reakit';
 
-import { Button, ButtonProps } from '../button';
+import { IconButton, IconButtonProps } from '../icon-button';
 
 import * as styles from './menu.css';
 
@@ -33,10 +33,12 @@ const useMenuContext = (): ReakitMenuStateReturn => {
   return menu;
 };
 
-export const MenuButton: FC<ButtonProps> = (props) => {
+export interface MenuButtonProps extends IconButtonProps {}
+
+export const MenuButton: FC<MenuButtonProps> = (props) => {
   const menu = useMenuContext();
 
-  return <ReakitMenuButton as={Button} {...props} {...menu} />;
+  return <ReakitMenuButton as={IconButton} {...props} {...menu} />;
 };
 
 export type MenuItemProps = HTMLAttributes<HTMLElement>;
@@ -57,8 +59,10 @@ export const MenuItem: FC<MenuItemProps> = (props) => {
 };
 
 export interface MenuProps {
-  button?: ReactElement<ButtonProps> | ButtonProps;
-  children?: (boolean | null | ReactElement<MenuItemProps>)[];
+  button: ReactElement<MenuButtonProps>;
+  children?:
+    | (boolean | null | ReactElement<MenuItemProps>)
+    | (boolean | null | ReactElement<MenuItemProps>)[];
 }
 
 export const Menu: FC<MenuProps> = ({ button, children }) => {
@@ -66,7 +70,7 @@ export const Menu: FC<MenuProps> = ({ button, children }) => {
 
   return (
     <MenuContext.Provider value={menu}>
-      {isValidElement<ButtonProps>(button) ? button : <MenuButton {...button} />}
+      {button}
       <ReakitMenu {...menu}>
         <div className={styles.items}>
           {Children.map(children, (child) =>

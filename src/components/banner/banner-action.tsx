@@ -1,21 +1,23 @@
-import { forwardRef, ReactElement } from 'react';
+import clsx from 'clsx';
+import { forwardRef } from 'react';
 
-import { Button, ButtonProps } from '../button';
+import { IconButton, IconButtonProps } from '../icon-button';
 
-export interface BannerActionProps extends ButtonProps {
-  icon?: ReactElement;
-  isLoading?: boolean;
-  isDisabled?: boolean;
-}
+import * as styles from './banner.css';
+
+export interface BannerActionProps extends IconButtonProps {}
 
 export const BannerAction = forwardRef<HTMLButtonElement, BannerActionProps>(function BannerAction(
   // eslint-disable-next-line react/prop-types -- https://github.com/yannickcr/eslint-plugin-react/issues/3140
-  { icon, children = icon, isLoading, isDisabled, ...props },
+  props,
   ref,
 ) {
   return (
-    <Button ref={ref} disabled={isDisabled} loading={isLoading} variant="minimal" {...props}>
-      {children}
-    </Button>
+    <IconButton
+      ref={ref}
+      variant="minimal"
+      {...props}
+      className={clsx(styles.bannerAction, props.className)}
+    />
   );
 });

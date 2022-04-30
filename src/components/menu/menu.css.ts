@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css';
 
 import { vars } from '../../theme';
-import { styles as buttonStyles } from '../button';
+import { styles as buttonBaseStyles } from '../button-base';
 
 export const ANIMATION_DURATION_MS = 150;
 
@@ -34,7 +34,7 @@ export const items = style({
 export const itemsInner = style({});
 
 export const item = style([
-  buttonStyles.reset,
+  buttonBaseStyles.reset,
   {
     textAlign: 'start',
     padding: vars.space[3],

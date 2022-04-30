@@ -1,21 +1,21 @@
 import { FC } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 
-import { Menu, MenuProps } from '../menu';
+import { Menu, MenuProps, MenuButton } from '../menu';
 
-export interface BannerOverflowMenuProps extends MenuProps {}
+import * as styles from './banner.css';
 
-export const BannerOverflowMenu: FC<BannerOverflowMenuProps> = ({ children, ...props }) => {
+export interface BannerOverflowMenuProps extends Partial<MenuProps> {}
+
+export const BannerOverflowMenu: FC<BannerOverflowMenuProps> = (props) => {
   return (
     <Menu
-      button={{
-        children: <FaEllipsisV />,
-        'aria-label': 'More',
-        variant: 'minimal',
-      }}
+      button={
+        <MenuButton aria-label="More" variant="minimal" className={styles.bannerAction}>
+          <FaEllipsisV />
+        </MenuButton>
+      }
       {...props}
-    >
-      {children}
-    </Menu>
+    />
   );
 };
