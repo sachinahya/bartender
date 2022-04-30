@@ -5,6 +5,7 @@ import mergeRefs from 'react-merge-refs';
 
 import { Button } from '../../components/button';
 import { Heading } from '../../components/heading';
+import { Footer, Layout, Main } from '../../components/layout';
 import {
   Drink as DrinkType,
   useRandomDrinkQuery,
@@ -13,7 +14,6 @@ import {
 } from '../../data/drink';
 import { useCallbackRef, usePalette, useParallax } from '../../utils';
 import { defineVar } from '../../utils/styles';
-import { Footer, Layout, Main } from '../layout';
 
 import * as styles from './drink.css';
 

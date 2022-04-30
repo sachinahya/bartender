@@ -89,8 +89,8 @@ export const { useDataQuery: useFavouriteDrinks, prefetchLoaderFactory: favourit
     },
   });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: Abstract and type this properly.
-export const useSaveFavouriteDrink = (): any => {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types -- TODO: Define this.
+export const useSaveFavouriteDrink = () => {
   return useMutation((newDrink: Drink) => {
     return favouritesStore.add(newDrink);
   });

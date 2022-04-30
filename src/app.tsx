@@ -5,8 +5,8 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
 import { ErrorMessage } from './components/error-message';
+import { LoadingView } from './components/layout';
 import { createRoutes } from './routes';
-import { LoadingView } from './views/layout/loading-view';
 
 const queryClient = new QueryClient({
   defaultOptions: {

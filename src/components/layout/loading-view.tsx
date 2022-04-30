@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { Progress } from '../../components/progress';
+import { Progress } from '../progress';
 
 import { Layout, Main } from './layout';
 import * as styles from './loading-view.css';

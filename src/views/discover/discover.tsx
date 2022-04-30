@@ -2,9 +2,9 @@ import { FC } from 'react';
 
 import { BackgroundContainer } from '../../components/background-container';
 import { Heading } from '../../components/heading';
+import { Footer, Layout, Main } from '../../components/layout';
 import { Tile, TileGrid } from '../../components/tile';
 import { useRandomDrinksQuery } from '../../data/drink';
-import { Footer, Layout, Main } from '../layout';
 
 import * as styles from './discover.css';
 

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { FC, HTMLAttributes } from 'react';
 import { FaGlassMartini, FaSearch, FaHeart } from 'react-icons/fa';
 
-import { BottomNavigation, BottomNavigationItem } from '../../components/bottom-navigation';
+import { BottomNavigation, BottomNavigationItem } from '../bottom-navigation';
 
 import * as styles from './layout.css';
 
