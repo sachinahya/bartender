@@ -1,21 +1,19 @@
 import { generateQuery } from '../../../data';
 import { Drink } from '../../../entities';
 
-import { fetchSingleDrink, getLookupUrl } from './common';
+import { CocktailApiContext, fetchSingleDrink, getLookupUrl, useApiContext } from './common';
 
 export const {
   useDataQuery: useDrinkQuery,
   useRouteMatchedDataQuery: useMatchedDrinkQuery,
-  prefetchLoaderFactory: drinkByIdLoader,
-} = generateQuery<{ id: string }, Drink>({
+  useLoader: useDrinkByIdLoader,
+} = generateQuery<{ id: string }, Drink, CocktailApiContext>({
   key: 'drink',
-  fetcher: ({ id }) => {
-    const url = getLookupUrl();
+  fetcher: ({ id }, context) => {
+    const url = getLookupUrl(context.meta.token);
     url.searchParams.set('i', id);
     return fetchSingleDrink(url);
   },
   getMatchParams: (routeMatch) => (routeMatch.params.id ? { id: routeMatch.params.id } : null),
-  loaderOptions: {
-    staleTime: 10_000,
-  },
+  useQueryContextMeta: useApiContext,
 });

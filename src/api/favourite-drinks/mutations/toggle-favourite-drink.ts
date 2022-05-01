@@ -1,19 +1,18 @@
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 
-import { useDrinkQuery } from '../../cocktail-db';
+import { Drink } from '../../../entities';
 import { getFavouriteDrinksKey } from '../queries/get-favourite-drinks';
 import { useIsFavouriteDrinkQuery, getIsFavouriteDrinkKey } from '../queries/is-favourite-drink';
 import { LocalStorageFavouritesStore } from '../store/local-storage-favourites-store';
 
 export const useFavouriteDrinkToggle = ({
-  id: drinkId,
+  drink,
 }: {
-  id: string;
+  drink: Drink;
 }): UseMutationResult<void, Error> => {
   const queryClient = useQueryClient();
 
-  const { data: drink } = useDrinkQuery({ id: drinkId });
-  const { data: isFavourite } = useIsFavouriteDrinkQuery({ id: drinkId });
+  const { data: isFavourite } = useIsFavouriteDrinkQuery({ id: drink.id });
 
   const key = drink ? getIsFavouriteDrinkKey({ id: drink.id }) : [];
 

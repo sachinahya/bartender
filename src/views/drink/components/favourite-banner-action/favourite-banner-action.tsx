@@ -14,7 +14,7 @@ export interface FavouriteBannerActionProps {
 
 export const FavouriteBannerAction: FC<FavouriteBannerActionProps> = ({ drink }) => {
   const { data: isFavourite } = useIsFavouriteDrinkQuery({ id: drink.id });
-  const toggleMutation = useFavouriteDrinkToggle({ id: drink.id });
+  const toggleMutation = useFavouriteDrinkToggle({ drink });
 
   const handleClick = () => {
     if (isFavourite != null) {

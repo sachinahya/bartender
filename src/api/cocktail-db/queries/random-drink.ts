@@ -1,18 +1,21 @@
 import { generateQuery } from '../../../data';
 import { Drink } from '../../../entities';
 
-import { fetchSingleDrink, getBaseUrl } from './common';
+import { CocktailApiContext, fetchSingleDrink, getBaseUrl, useApiContext } from './common';
 
-export const { useDataQuery: useRandomDrinkQuery, prefetchLoaderFactory: randomDrinkLoader } =
-  generateQuery<Drink>({
-    key: 'randomDrink',
-    fetcher: () => {
-      const url = getBaseUrl();
-      url.pathname += '/random.php';
-      return fetchSingleDrink(url);
-    },
-    commonOptions: {
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    },
-  });
+export const { useDataQuery: useRandomDrinkQuery, useLoader: useRandomDrinkLoader } = generateQuery<
+  Drink,
+  CocktailApiContext
+>({
+  key: 'randomDrink',
+  fetcher: (context) => {
+    const url = getBaseUrl(context.meta.token);
+    url.pathname += '/random.php';
+    return fetchSingleDrink(url);
+  },
+  useQueryContextMeta: useApiContext,
+  commonOptions: {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  },
+});

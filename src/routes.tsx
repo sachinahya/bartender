@@ -1,20 +1,19 @@
 import { Route } from '@tanstack/react-location';
-import { QueryClient } from 'react-query';
 
-import { randomDrinksLoader, randomDrinkLoader, drinkByIdLoader } from './api/cocktail-db';
-import { favouriteDrinksLoader } from './api/favourite-drinks';
+import { useDrinkByIdLoader, useRandomDrinkLoader, useRandomDrinksLoader } from './api/cocktail-db';
+import { useFavouriteDrinksLoader } from './api/favourite-drinks';
 import { Discover } from './views/discover';
 
-export const createRoutes = (queryClient: QueryClient): Route[] => [
+export const useRoutes = (): Route[] => [
   {
     path: '/',
     element: <Discover />,
-    loader: randomDrinksLoader(queryClient),
+    loader: useRandomDrinksLoader(),
   },
   {
     path: 'favourites',
     element: () => import('./views/favourites').then(({ Favourites }) => <Favourites />),
-    loader: favouriteDrinksLoader(queryClient),
+    loader: useFavouriteDrinksLoader(),
   },
   {
     path: 'drink',
@@ -22,12 +21,12 @@ export const createRoutes = (queryClient: QueryClient): Route[] => [
       {
         path: 'random',
         element: () => import('./views/drink').then(({ Drink }) => <Drink />),
-        loader: randomDrinkLoader(queryClient),
+        loader: useRandomDrinkLoader(),
       },
       {
         path: ':id',
         element: () => import('./views/drink').then(({ Drink }) => <Drink />),
-        loader: drinkByIdLoader(queryClient),
+        loader: useDrinkByIdLoader(),
       },
     ],
   },

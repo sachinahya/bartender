@@ -1,12 +1,16 @@
 import { generateQuery } from '../../../data';
-import { LocalStorageFavouritesStore } from '../store/local-storage-favourites-store';
+import { useFavouritesStore } from '../store/context';
+import { FavouritesStore } from '../store/favourites-store';
 
 export const {
   getKey: getIsFavouriteDrinkKey,
   useDataQuery: useIsFavouriteDrinkQuery,
   useRouteMatchedDataQuery: useIsMatchedFavouriteDrinkQuery,
-} = generateQuery<{ id: string }, boolean>({
+} = generateQuery<{ id: string }, boolean, { store: FavouritesStore }>({
   key: 'favouriteDrink',
-  fetcher: ({ id }) => new LocalStorageFavouritesStore().isFavourite(id),
+  fetcher: ({ id }, context) => context.meta.store.isFavourite(id),
   getMatchParams: (routeMatch) => (routeMatch.params.id ? { id: routeMatch.params.id } : null),
+  useQueryContextMeta: () => ({
+    store: useFavouritesStore(),
+  }),
 });

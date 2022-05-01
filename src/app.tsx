@@ -4,9 +4,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
+import { FavouritesStoreProvider, LocalStorageFavouritesStore } from './api/favourite-drinks';
 import { ErrorMessage } from './components/error-message';
 import { LoadingView } from './components/layout';
-import { createRoutes } from './routes';
+import { useRoutes } from './routes';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,11 +17,13 @@ const queryClient = new QueryClient({
   },
 });
 const location = new ReactLocation();
-const routes = createRoutes(queryClient);
 
-export const App: FC = () => (
-  <QueryClientProvider client={queryClient}>
-    <ReactQueryDevtools />
+const favouritesStore = new LocalStorageFavouritesStore();
+
+const Routes: FC = () => {
+  const routes = useRoutes();
+
+  return (
     <Router
       location={location}
       routes={routes}
@@ -37,5 +40,16 @@ export const App: FC = () => (
       </ErrorBoundary>
       {/* <ReactLocationDevtools /> */}
     </Router>
-  </QueryClientProvider>
-);
+  );
+};
+
+export const App: FC = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <FavouritesStoreProvider store={favouritesStore}>
+        <ReactQueryDevtools />
+        <Routes />
+      </FavouritesStoreProvider>
+    </QueryClientProvider>
+  );
+};

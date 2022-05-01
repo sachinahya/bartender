@@ -1,12 +1,16 @@
 import { generateQuery } from '../../../data';
 import { Drink } from '../../../entities';
-import { LocalStorageFavouritesStore } from '../store/local-storage-favourites-store';
+import { useFavouritesStore } from '../store/context';
+import { FavouritesStore } from '../store/favourites-store';
 
 export const {
   getKey: getFavouriteDrinksKey,
   useDataQuery: useFavouriteDrinksQuery,
-  prefetchLoaderFactory: favouriteDrinksLoader,
-} = generateQuery<Drink[]>({
+  useLoader: useFavouriteDrinksLoader,
+} = generateQuery<Drink[], { store: FavouritesStore }>({
   key: 'favouriteDrinks',
-  fetcher: () => new LocalStorageFavouritesStore().getAll(),
+  fetcher: (context) => context.meta.store.getAll(),
+  useQueryContextMeta: () => ({
+    store: useFavouritesStore(),
+  }),
 });

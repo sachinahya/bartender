@@ -1,8 +1,6 @@
 import { LoaderFn, RouteMatch, useMatch } from '@tanstack/react-location';
-import memoizeOne from 'memoize-one';
 import {
   FetchQueryOptions,
-  QueryClient,
   QueryFunctionContext,
   QueryFunctionData,
   useQuery,
@@ -34,21 +32,24 @@ export type CommonDataOptions<K extends SimpleQueryKey | ParameterizedQueryKey<P
   | UseDataQueryOptions<K, R>
   | FetchDataOptions<K, R>;
 
-export interface CommonGenerateQueryOptions {
+export interface CommonGenerateQueryOptions<C> {
   key: KeyId;
+  useQueryContextMeta?: () => C;
 }
 
-export interface GenerateQueryOptionsNoParams<R> extends CommonGenerateQueryOptions {
-  fetcher: (context: QueryFunctionContext<SimpleQueryKey>) => Promise<QueryFunctionData<R>>;
+export interface GenerateQueryOptionsNoParams<R, C> extends CommonGenerateQueryOptions<C> {
+  fetcher: (
+    context: QueryFunctionContext<SimpleQueryKey> & { meta: C },
+  ) => Promise<QueryFunctionData<R>>;
   commonOptions?: CommonDataOptions<SimpleQueryKey, R>;
   loaderOptions?: FetchDataOptions<SimpleQueryKey, R>;
 }
 
-export interface GenerateQueryOptionsWithParams<P extends Params, R>
-  extends CommonGenerateQueryOptions {
+export interface GenerateQueryOptionsWithParams<P extends Params, R, C>
+  extends CommonGenerateQueryOptions<C> {
   fetcher: (
     params: P,
-    context: QueryFunctionContext<ParameterizedQueryKey<P>>,
+    context: QueryFunctionContext<ParameterizedQueryKey<P>> & { meta: C },
   ) => Promise<QueryFunctionData<R>>;
   getMatchParams: (routeMatch: RouteMatch) => Readonly<P> | null;
   commonOptions?: CommonDataOptions<ParameterizedQueryKey<P>, R>;
@@ -59,7 +60,7 @@ export interface GeneratedNoParams<R> {
   getKey: () => SimpleQueryKey;
   // fetchData: () => Promise<R>;
   useDataQuery: (options?: UseDataQueryOptions<SimpleQueryKey, R>) => UseQueryResult<R, Error>;
-  prefetchLoaderFactory: (queryClient: QueryClient) => LoaderFn;
+  useLoader: () => LoaderFn;
 }
 
 export interface GeneratedWithParams<P extends Params, R> {
@@ -72,28 +73,24 @@ export interface GeneratedWithParams<P extends Params, R> {
   useRouteMatchedDataQuery: (
     options?: UseDataQueryOptions<ParameterizedQueryKey<P>, R>,
   ) => UseQueryResult<R, Error>;
-  prefetchLoaderFactory: (queryClient: QueryClient) => LoaderFn;
+  useLoader: () => LoaderFn;
 }
 
-const useDefaultQueryOptions = (prefetchLoaderFactory: (queryClient: QueryClient) => LoaderFn) => {
-  const queryClient = useQueryClient();
-  const { route } = useMatch();
+const defaultContextThing = {};
+const defaultContextFn = () => defaultContextThing;
 
-  return {
-    // Don't refetch on mount if the data was already provided by a loader.
-    // The prefetchLoaderFactory's return needs to be memoized for this equality check to work.
-    refetchOnMount: route.loader === prefetchLoaderFactory(queryClient) ? false : undefined,
-  };
-};
-
-export function generateQuery<R>(options: GenerateQueryOptionsNoParams<R>): GeneratedNoParams<R>;
-export function generateQuery<P extends Params, R>(
-  options: GenerateQueryOptionsWithParams<P, R>,
+export function generateQuery<R, C>(
+  options: GenerateQueryOptionsNoParams<R, C>,
+): GeneratedNoParams<R>;
+export function generateQuery<P extends Params, R, C>(
+  options: GenerateQueryOptionsWithParams<P, R, C>,
 ): GeneratedWithParams<P, R>;
-export function generateQuery<P extends Params, R>(
-  options: GenerateQueryOptionsNoParams<R> | GenerateQueryOptionsWithParams<P, R>,
+export function generateQuery<P extends Params, R, C>(
+  options: GenerateQueryOptionsNoParams<R, C> | GenerateQueryOptionsWithParams<P, R, C>,
 ): GeneratedNoParams<R> | GeneratedWithParams<P, R> {
   // Empty comment so Prettier keeps spacing.
+
+  const useQueryContextMeta = options.useQueryContextMeta || defaultContextFn;
 
   if ('getMatchParams' in options) {
     type Result = GeneratedWithParams<P, R>;
@@ -101,28 +98,36 @@ export function generateQuery<P extends Params, R>(
 
     const getKey: Result['getKey'] = (params) => [key, params];
 
-    const prefetchLoaderFactory = memoizeOne<Result['prefetchLoaderFactory']>(
-      (queryClient) => async (match) => {
+    const useLoader: Result['useLoader'] = () => {
+      const queryClient = useQueryClient();
+      const meta = useQueryContextMeta();
+
+      return async (match) => {
         const params = getMatchParams(match);
 
         if (params) {
-          await queryClient.prefetchQuery(getKey(params), (context) => fetcher(params, context), {
-            ...commonOptions,
-            ...loaderOptions,
-          });
+          await queryClient.prefetchQuery(
+            getKey(params),
+            (context) => fetcher(params, context as never),
+            {
+              ...commonOptions,
+              ...loaderOptions,
+              meta,
+            },
+          );
         }
 
         return {};
-      },
-    );
+      };
+    };
 
     const useDataQuery: Result['useDataQuery'] = (params, options) => {
-      const defaultOptions = useDefaultQueryOptions(prefetchLoaderFactory);
+      const meta = useQueryContextMeta();
 
-      return useQuery(getKey(params), (context) => fetcher(params, context), {
-        ...defaultOptions,
+      return useQuery(getKey(params), (context) => fetcher(params, context as never), {
         ...commonOptions,
         ...options,
+        meta,
       });
     };
 
@@ -134,7 +139,7 @@ export function generateQuery<P extends Params, R>(
 
     return {
       getKey,
-      prefetchLoaderFactory,
+      useLoader,
       useDataQuery,
       useRouteMatchedDataQuery,
     };
@@ -145,29 +150,34 @@ export function generateQuery<P extends Params, R>(
 
   const getKey: Result['getKey'] = () => [key];
 
-  const prefetchLoaderFactory = memoizeOne<Result['prefetchLoaderFactory']>(
-    (queryClient) => async () => {
-      await queryClient.prefetchQuery(getKey(), (context) => fetcher(context), {
+  const useLoader: Result['useLoader'] = () => {
+    const queryClient = useQueryClient();
+    const meta = useQueryContextMeta();
+
+    return async () => {
+      await queryClient.prefetchQuery(getKey(), (context) => fetcher(context as never), {
         ...commonOptions,
         ...loaderOptions,
+        meta,
       });
+
       return {};
-    },
-  );
+    };
+  };
 
   const useDataQuery: Result['useDataQuery'] = (options) => {
-    const defaultQueryOptions = useDefaultQueryOptions(prefetchLoaderFactory);
+    const meta = useQueryContextMeta();
 
-    return useQuery(getKey(), (context) => fetcher(context), {
-      ...defaultQueryOptions,
+    return useQuery(getKey(), (context) => fetcher(context as never), {
       ...commonOptions,
       ...options,
+      meta,
     });
   };
 
   return {
     getKey,
-    prefetchLoaderFactory,
+    useLoader,
     useDataQuery,
   };
 }
