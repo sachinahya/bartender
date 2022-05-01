@@ -1,12 +1,12 @@
 import { FC } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
-import { BannerAction } from '../../../../components/banner';
-import { Drink } from '../../../../data/drink';
 import {
-  useIsFavouriteDrinkQuery,
   useFavouriteDrinkToggle,
-} from '../../../../data/drink/favourite-drinks';
+  useIsFavouriteDrinkQuery,
+} from '../../../../api/favourite-drinks';
+import { BannerAction } from '../../../../components/banner';
+import { Drink } from '../../../../entities';
 
 export interface FavouriteBannerActionProps {
   drink: Drink;

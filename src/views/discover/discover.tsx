@@ -1,10 +1,10 @@
 import { FC } from 'react';
 
+import { useRandomDrinksQuery } from '../../api/cocktail-db';
 import { BackgroundContainer } from '../../components/background-container';
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
 import { Tile, TileGrid } from '../../components/tile';
-import { useRandomDrinksQuery } from '../../data/drink';
 
 import * as styles from './discover.css';
 

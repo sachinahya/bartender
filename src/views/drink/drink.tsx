@@ -2,6 +2,7 @@ import { useMatch } from '@tanstack/react-location';
 import { FC } from 'react';
 import mergeRefs from 'react-merge-refs';
 
+import { useMatchedDrinkQuery, useRandomDrinkQuery } from '../../api/cocktail-db';
 import {
   Banner,
   BannerBackAction,
@@ -11,7 +12,7 @@ import {
 } from '../../components/banner';
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
-import { Drink as DrinkType, useRandomDrinkQuery, useMatchedDrinkQuery } from '../../data/drink';
+import { Drink as DrinkType } from '../../entities';
 import { useCallbackRef, usePalette, useParallax } from '../../utils';
 import { defineVar } from '../../utils/styles';
 

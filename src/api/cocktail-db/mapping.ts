@@ -1,6 +1,7 @@
+import { Drink, DrinkIngredient } from '../../entities';
 import { getPalette } from '../../utils/get-palette';
 
-import { Drink, DrinkIngredient, DrinksResponseItem } from './types';
+import { DrinksResponseItem } from './response';
 
 export const responseToEntity = async (item: DrinksResponseItem): Promise<Drink> => {
   const ingredients: DrinkIngredient[] = [

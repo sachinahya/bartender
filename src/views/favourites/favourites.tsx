@@ -1,10 +1,10 @@
 import { FC } from 'react';
 
+import { useFavouriteDrinksQuery } from '../../api/favourite-drinks';
 import { BackgroundContainer } from '../../components/background-container';
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
 import { Tile, TileGrid } from '../../components/tile';
-import { useFavouriteDrinksQuery } from '../../data/drink/favourite-drinks';
 
 import * as styles from './favourites.css';
 

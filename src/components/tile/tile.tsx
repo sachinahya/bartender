@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { FC, HTMLAttributes } from 'react';
 
-import { Drink } from '../../data/drink';
+import { Drink } from '../../entities';
 import { Link } from '../link';
 import { styles as linkOverlayStyles } from '../link-overlay';
 
