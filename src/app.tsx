@@ -1,5 +1,5 @@
 import { Outlet, ReactLocation, Router } from '@tanstack/react-location';
-import { FC, Suspense } from 'react';
+import { FC, StrictMode, Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
@@ -45,11 +45,13 @@ const Routes: FC = () => {
 
 export const App: FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <FavouritesStoreProvider store={favouritesStore}>
-        <ReactQueryDevtools />
-        <Routes />
-      </FavouritesStoreProvider>
-    </QueryClientProvider>
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <FavouritesStoreProvider store={favouritesStore}>
+          <ReactQueryDevtools />
+          <Routes />
+        </FavouritesStoreProvider>
+      </QueryClientProvider>
+    </StrictMode>
   );
 };
