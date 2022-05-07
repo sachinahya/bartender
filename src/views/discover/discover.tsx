@@ -4,7 +4,7 @@ import { useRandomDrinksQuery } from '../../api/cocktail-db';
 import { BackgroundContainer } from '../../components/background-container';
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
-import { Tile, TileGrid } from '../../components/tile';
+import { Tile, Tiles } from '../../components/tile';
 
 import * as styles from './discover.css';
 
@@ -22,11 +22,15 @@ export const Discover: FC = () => {
             Discover
           </Heading>
 
-          <TileGrid>
+          <Heading level="h2" variant="h1" className={styles.sectionTitle}>
+            Random
+          </Heading>
+
+          <Tiles variant="slider" className={styles.slider}>
             {drinks.map((drink) => (
               <Tile key={drink.id} drink={drink} />
             ))}
-          </TileGrid>
+          </Tiles>
         </BackgroundContainer>
       </Main>
       <Footer />

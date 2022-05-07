@@ -10,7 +10,7 @@ export const root = style({
 });
 
 export const img = style({
-  maxInlineSize: '100%',
+  inlineSize: '100%',
 });
 
 export const header = style({});
@@ -33,8 +33,9 @@ export const link = style({
 });
 
 export const overlayLink = style({
-  marginBlockStart: '-3em',
+  marginBlockStart: '-100%',
   opacity: 0,
+  WebkitTapHighlightColor: 'transparent',
 });
 
 export const category = style({

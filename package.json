@@ -23,6 +23,7 @@
     "@tanstack/react-location-devtools": "^3.4.4",
     "@types/react": "^18.0.1",
     "@types/react-dom": "^18.0.0",
+    "@vanilla-extract/css-utils": "^0.1.2",
     "clsx": "^1.1.1",
     "cross-env": "^7.0.3",
     "csstype": "^3.0.11",

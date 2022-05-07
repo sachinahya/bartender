@@ -1,2 +1,2 @@
 export * from './tile';
-export * from './tile-grid';
+export * from './tiles';
