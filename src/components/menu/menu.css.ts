@@ -5,33 +5,37 @@ import { styles as buttonBaseStyles } from '../button-base';
 
 export const ANIMATION_DURATION_MS = 150;
 
+export const root = style({
+  position: 'relative',
+});
+
 export const items = style({
+  position: 'absolute',
+  right: 0,
   display: 'flex',
   flexDirection: 'column',
   backgroundColor: vars.colors.white,
+  color: vars.colors.black,
   border: `1px solid ${vars.colors.gray[300]}`,
   marginBlockStart: vars.space[1],
   paddingBlock: vars.space[1],
   borderRadius: vars.radii.base,
   outline: 0,
-
-  transition: `opacity ${ANIMATION_DURATION_MS}ms ease-in-out, transform ${ANIMATION_DURATION_MS}ms ease-in-out`,
-  opacity: 0,
-  transform: 'translateY(-10px)',
-
-  selectors: {
-    '[data-enter] &': {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-    '[data-leave] &': {
-      opacity: 0,
-      transform: 'translateY(-10px)',
-    },
-  },
 });
 
-export const itemsInner = style({});
+export const itemsTransition = style({
+  transition: `opacity ${ANIMATION_DURATION_MS}ms ease-in-out, transform ${ANIMATION_DURATION_MS}ms ease-in-out`,
+});
+
+export const itemsEnter = style({
+  opacity: 1,
+  transform: 'translateY(0)',
+});
+
+export const itemsLeave = style({
+  opacity: 0,
+  transform: 'translateY(-10px)',
+});
 
 export const item = style([
   buttonBaseStyles.reset,
@@ -41,12 +45,18 @@ export const item = style([
     outline: 0,
     cursor: 'pointer',
 
-    ':hover': {
-      backgroundColor: vars.colors.gray[100],
-    },
-
-    ':focus': {
-      backgroundColor: vars.colors.gray[100],
+    selectors: {
+      '&:hover:not(:disabled), &:focus:not(:disabled)': {
+        backgroundColor: vars.colors.gray[100],
+      },
     },
   },
 ]);
+
+export const itemActive = style({
+  backgroundColor: vars.colors.gray[100],
+});
+
+export const itemDisabled = style({
+  color: vars.colors.gray[300],
+});
