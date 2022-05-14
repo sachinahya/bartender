@@ -1,5 +1,13 @@
-export interface DrinksResponse {
-  drinks: DrinksResponseItem[];
+export interface CocktailApiResponse<T> {
+  drinks: T[];
+}
+
+export interface CategoriesResponseItem {
+  strCategory: string;
+}
+
+export interface IngredientsResponseItem {
+  strIngredient1: string;
 }
 
 export interface DrinksResponseItem {
