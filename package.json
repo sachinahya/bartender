@@ -24,6 +24,7 @@
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.3",
     "@vanilla-extract/css-utils": "^0.1.2",
+    "@vanilla-extract/dynamic": "^2.0.2",
     "clsx": "^1.1.1",
     "cross-env": "^7.0.3",
     "csstype": "^3.0.11",

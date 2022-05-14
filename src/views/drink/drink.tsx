@@ -1,4 +1,5 @@
 import { useMatch } from '@tanstack/react-location';
+import { assignInlineVars } from '@vanilla-extract/dynamic';
 import { FC } from 'react';
 import mergeRefs from 'react-merge-refs';
 
@@ -14,7 +15,6 @@ import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
 import { Drink as DrinkType } from '../../entities';
 import { useCallbackRef, usePalette, useParallax } from '../../utils';
-import { defineVar } from '../../utils/styles';
 
 import { FavouriteBannerAction } from './components/favourite-banner-action';
 import * as styles from './drink.css';
@@ -53,10 +53,10 @@ export const Drink: FC = () => {
         {drink ? (
           <article
             className={styles.root}
-            style={{
-              [defineVar(styles.darkVibrantVar)]: drink.palette.darkVibrant,
-              [defineVar(styles.lightMutedVar)]: drink.palette.lightMuted,
-            }}
+            style={assignInlineVars({
+              [styles.darkVibrantVar]: drink.palette.darkVibrant || '',
+              [styles.lightMutedVar]: drink.palette.lightMuted || '',
+            })}
           >
             <header className={styles.header}>
               <Heading level="h1" variant="h1" className={styles.drinkName}>
