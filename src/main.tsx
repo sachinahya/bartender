@@ -5,14 +5,31 @@ import './global.css';
 // https://github.com/TanStack/react-location/pull/236
 import 'regenerator-runtime';
 
-import { createRoot } from 'react-dom/client';
+import { hydrateRoot } from 'react-dom/client';
 
 import { App } from './app';
+import { ReactLocation } from '@tanstack/react-location';
+import { QueryClient } from 'react-query';
 
-const container = document.querySelector('#root');
+const location = new ReactLocation();
 
-if (!container) {
-  throw new Error('Missing #root element.');
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      suspense: true,
+    },
+  },
+});
 
-createRoot(container).render(<App />);
+const dehydratedState = window.__REACT_QUERY_STATE__;
+
+hydrateRoot(
+  document,
+  <App
+    location={location}
+    transformation={window.__TRANSFORMATION__.replaceAll('<\\/script>', '</script>')}
+    isServer={false}
+    queryClient={queryClient}
+    queryState={dehydratedState}
+  />,
+);
