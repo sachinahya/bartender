@@ -7,14 +7,6 @@ export interface Drink {
   alcoholic: string;
   glass: string;
   image: string;
-  palette: {
-    vibrant?: string;
-    lightVibrant?: string;
-    darkVibrant?: string;
-    muted?: string;
-    lightMuted?: string;
-    darkMuted?: string;
-  };
   instructions: string[];
   ingredients: DrinkIngredient[];
 }

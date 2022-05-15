@@ -1,32 +1,70 @@
+import { assignInlineVars } from '@vanilla-extract/dynamic';
 import clsx from 'clsx';
-import { FC, HTMLAttributes } from 'react';
+import {
+  cloneElement,
+  FC,
+  HTMLAttributes,
+  ImgHTMLAttributes,
+  isValidElement,
+  ReactElement,
+  ReactNode,
+} from 'react';
 
-import { Drink } from '../../entities';
 import { Link } from '../link';
 import { styles as linkOverlayStyles } from '../link-overlay';
 
 import * as styles from './tile.css';
 
 export interface TileProps extends HTMLAttributes<HTMLElement> {
-  drink: Drink;
+  tileTitle: ReactNode;
+  subtitle?: ReactNode;
+  image: string | ReactElement<ImgHTMLAttributes<HTMLImageElement>>;
+  imageAlt?: string;
+  href: string;
+  backgroundColor?: string;
 }
 
-export const Tile: FC<TileProps> = ({ drink, ...props }) => {
+export const Tile: FC<TileProps> = ({
+  tileTitle,
+  subtitle,
+  image,
+  imageAlt,
+  href,
+  backgroundColor,
+  ...props
+}) => {
+  const imageElement = isValidElement(image) ? (
+    cloneElement(image, {
+      className: clsx(styles.img, image.props.className),
+    })
+  ) : (
+    <img src={image} alt={imageAlt} className={styles.img} />
+  );
+
   return (
-    <article {...props} className={clsx(styles.root, linkOverlayStyles.linkBox, props.className)}>
-      <img src={drink.image} alt={drink.name} className={styles.img} />
+    <article
+      {...props}
+      style={{
+        ...assignInlineVars({
+          [styles.backgroundColorVar]: backgroundColor || '',
+        }),
+        ...props.style,
+      }}
+      className={clsx(styles.root, linkOverlayStyles.linkBox, props.className)}
+    >
+      {imageElement}
       <div className={styles.content}>
-        <Link to={`/drink/${drink.id}`} className={styles.link}>
-          {drink.name}
+        <Link to={href} className={styles.link}>
+          {tileTitle}
         </Link>
-        <div className={styles.category}>{drink.category}</div>
+        {subtitle && <div className={styles.category}>{subtitle}</div>}
       </div>
       <Link
         aria-hidden
-        to={`/drink/${drink.id}`}
+        to={href}
         className={clsx(linkOverlayStyles.linkOverlay, styles.overlayLink)}
       >
-        {drink.name}
+        {tileTitle}
       </Link>
     </article>
   );

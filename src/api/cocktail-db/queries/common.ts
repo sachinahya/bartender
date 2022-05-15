@@ -3,6 +3,8 @@ import { Drink } from '../../../entities';
 import { responseToEntity } from '../mapping';
 import { CocktailApiResponse, DrinksResponseItem } from '../response';
 
+export const getImagesUrl = (): URL => new URL('https://www.thecocktaildb.com/images');
+
 export const getBaseUrl = (token: string): URL =>
   new URL(`https://www.thecocktaildb.com/api/json/v1/${token}`);
 
@@ -30,9 +32,13 @@ export const fetchSingleDrink = async (url: URL): Promise<Drink> => {
   return responseToEntity(drinkJson);
 };
 
-export const fetchList = async <T, R>(url: URL, transformer: (item: T) => R): Promise<R[]> => {
+export const fetchList = async <T, R>(
+  url: URL,
+  transformer: (item: T) => R | Promise<R>,
+): Promise<R[]> => {
   const response = await fetchJson<CocktailApiResponse<T>>(url.toString());
-  return response.drinks.map<R>((item) => transformer(item));
+  const transformPromises = response.drinks.map((item) => Promise.resolve(transformer(item)));
+  return Promise.all(transformPromises);
 };
 
 export interface CocktailApiContext {

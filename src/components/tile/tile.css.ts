@@ -1,12 +1,15 @@
-import { style } from '@vanilla-extract/css';
+import { createVar, style } from '@vanilla-extract/css';
 
 import { vars } from '../../theme';
+
+export const backgroundColorVar = createVar();
 
 export const root = style({
   display: 'grid',
   alignItems: 'center',
   justifyItems: 'center',
   position: 'relative',
+  backgroundColor: backgroundColorVar,
 });
 
 export const img = style({

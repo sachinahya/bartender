@@ -1,9 +1,8 @@
 import { Drink, DrinkIngredient } from '../../entities';
-import { getPalette } from '../../utils/get-palette';
 
 import { DrinksResponseItem } from './response';
 
-export const responseToEntity = async (item: DrinksResponseItem): Promise<Drink> => {
+export const responseToEntity = (item: DrinksResponseItem): Drink => {
   const ingredients: DrinkIngredient[] = [
     [item.strIngredient1, item.strMeasure1],
     [item.strIngredient2, item.strMeasure2],
@@ -40,7 +39,6 @@ export const responseToEntity = async (item: DrinksResponseItem): Promise<Drink>
     alcoholic: item.strAlcoholic,
     glass: item.strGlass,
     image: item.strDrinkThumb,
-    palette: {} || (await getPalette(item.strDrinkThumb)),
     instructions: item.strInstructions.split('\r\n').filter(Boolean),
     ingredients,
   };

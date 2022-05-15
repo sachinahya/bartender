@@ -24,6 +24,10 @@ export const sectionTitle = style({
   marginBlockEnd: vars.space[10],
 });
 
+export const tiles = style({
+  marginBlockStart: vars.space[8],
+});
+
 export const slider = style({
   marginInlineEnd: calc.negate(vars.space[4]),
 });
