@@ -1,6 +1,6 @@
 import { Route } from '@tanstack/react-location';
 
-import { useDrinkByIdLoader, useRandomDrinkLoader } from './api/cocktail-db';
+import { useDrinkByIdLoader, useRandomDrinkLoader, useRandomDrinksLoader } from './api/cocktail-db';
 import { useFavouriteDrinksLoader } from './api/favourite-drinks';
 import { Discover } from './views/discover';
 
@@ -8,7 +8,7 @@ export const useRoutes = (): Route[] => [
   {
     path: '/',
     element: <Discover />,
-    // loader: useRandomDrinksLoader(),
+    loader: useRandomDrinksLoader(),
   },
   {
     path: 'favourites',

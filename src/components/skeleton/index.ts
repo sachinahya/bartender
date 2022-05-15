@@ -1,1 +1,1 @@
-export * from './skeleton-text';
+export * from './skeleton';

@@ -4,7 +4,7 @@ import { useFavouriteDrinksQuery } from '../../api/favourite-drinks';
 import { BackgroundContainer } from '../../components/background-container';
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
-import { Tile, Tiles } from '../../components/tile';
+import { DrinkTiles } from '../../components/tile';
 
 import * as styles from './favourites.css';
 
@@ -17,16 +17,12 @@ export const Favourites: FC = () => {
   return (
     <Layout>
       <Main>
-        <BackgroundContainer image={img} imageMaxSize={350} className={styles.intro}>
+        <BackgroundContainer image={img} imageMaxSize={350} forceMinSize className={styles.intro}>
           <Heading level="h1" className={styles.pageTitle}>
             Favourites
           </Heading>
 
-          <Tiles variant="grid">
-            {drinks.map((drink) => (
-              <Tile key={drink.id} drink={drink} />
-            ))}
-          </Tiles>
+          <DrinkTiles variant="grid" drinks={drinks} />
         </BackgroundContainer>
       </Main>
       <Footer />

@@ -1,25 +1,15 @@
-import { FC, HTMLAttributes } from 'react';
+import { FC } from 'react';
+import type { Except } from 'type-fest';
 
 import { useRandomDrinksQuery } from '../../../../api/cocktail-db';
-import { Tiles, Tile } from '../../../../components/tile';
+import { DrinkTiles, TilesProps } from '../../../../components/tile';
 
-export interface RandomDrinksTilesProps extends HTMLAttributes<HTMLElement> {}
+export interface RandomDrinksTilesProps extends Except<TilesProps, 'children'> {
+  count: number;
+}
 
-export const RandomDrinksTiles: FC<RandomDrinksTilesProps> = (props) => {
-  const { data: drinks = [] } = useRandomDrinksQuery();
+export const RandomDrinksTiles: FC<RandomDrinksTilesProps> = ({ count, ...props }) => {
+  const { data: drinks = [] } = useRandomDrinksQuery({ count });
 
-  return (
-    <Tiles variant="slider" {...props}>
-      {drinks.map((drink) => (
-        <Tile
-          key={drink.id}
-          tileTitle={drink.name}
-          subtitle={drink.category}
-          image={drink.image}
-          imageAlt={drink.name}
-          href={`/drink/${drink.id}`}
-        />
-      ))}
-    </Tiles>
-  );
+  return <DrinkTiles drinks={drinks} {...props} />;
 };

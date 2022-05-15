@@ -5,13 +5,19 @@ import { TileProps } from './tile';
 import * as styles from './tiles.css';
 
 export interface TilesProps extends HTMLAttributes<HTMLElement> {
-  children: ReactElement<TileProps> | ReactElement<TileProps>[];
-  variant: styles.Variant;
+  children?: ReactElement<TileProps> | ReactElement<TileProps>[];
+  variant?: styles.Variant;
   ulProps?: HTMLAttributes<HTMLUListElement>;
   liProps?: LiHTMLAttributes<HTMLLIElement>;
 }
 
-export const Tiles: FC<TilesProps> = ({ children, variant, ulProps, liProps, ...props }) => {
+export const Tiles: FC<TilesProps> = ({
+  children,
+  variant = 'grid',
+  ulProps,
+  liProps,
+  ...props
+}) => {
   return (
     <div {...props} className={clsx(styles.root[variant], props.className)}>
       <ul {...ulProps} className={clsx(styles.list[variant], ulProps?.className)}>

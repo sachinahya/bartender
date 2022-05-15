@@ -5,14 +5,15 @@ import { delay } from '../../../utils';
 import { CocktailApiContext, fetchSingleDrink, getBaseUrl, useApiContext } from './common';
 
 export const { useDataQuery: useRandomDrinksQuery, useLoader: useRandomDrinksLoader } =
-  generateQuery<Drink[], CocktailApiContext>({
+  generateQuery<{ count: number }, Drink[], CocktailApiContext>({
     key: 'randomDrinks',
-    fetcher: async (context) => {
+    fetcher: async ({ count }, context) => {
       const url = getBaseUrl(context.meta.token);
       url.pathname += '/random.php';
       await delay(3000);
-      return Promise.all(Array.from({ length: 10 }).map(() => fetchSingleDrink(url)));
+      return Promise.all(Array.from({ length: count }).map(() => fetchSingleDrink(url)));
     },
+    getMatchParams: () => ({ count: 10 }),
     useQueryContextMeta: useApiContext,
     commonOptions: {
       refetchOnWindowFocus: false,

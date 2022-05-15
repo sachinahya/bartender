@@ -13,7 +13,7 @@ import {
 } from '../../components/banner';
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
-import { Drink as DrinkType } from '../../entities';
+import { PaletteDump } from '../../components/palette-dump';
 import { useCallbackRef, usePalette, useParallax } from '../../utils';
 
 import { FavouriteBannerAction } from './components/favourite-banner-action';
@@ -28,16 +28,12 @@ export const Drink: FC = () => {
     enabled: isRandomDrinkView,
   });
 
-  const drinkNoPalette = drinkById || randomDrink;
+  const drink = drinkById || randomDrink;
 
   const parallaxRef = useParallax(6);
   const [imageRef, setImageRef] = useCallbackRef<HTMLImageElement>();
 
-  const palette = usePalette(imageRef);
-
-  const drink: DrinkType | undefined = drinkNoPalette
-    ? { ...drinkNoPalette, palette: palette.palette || {} }
-    : undefined;
+  const { palette } = usePalette(imageRef);
 
   return (
     <Layout>
@@ -54,8 +50,8 @@ export const Drink: FC = () => {
           <article
             className={styles.root}
             style={assignInlineVars({
-              [styles.darkVibrantVar]: drink.palette.darkVibrant || '',
-              [styles.lightMutedVar]: drink.palette.lightMuted || '',
+              [styles.darkVibrantVar]: palette?.darkVibrant || '',
+              [styles.lightMutedVar]: palette?.lightMuted || '',
             })}
           >
             <header className={styles.header}>
@@ -124,24 +120,7 @@ export const Drink: FC = () => {
                 </>
               )}
 
-              {drink.palette && (
-                <div
-                  style={{
-                    fontSize: 12,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    textAlign: 'center',
-                    lineHeight: 2,
-                    marginBlockStart: 20,
-                  }}
-                >
-                  {Object.entries(drink.palette).map(([name, color]) => (
-                    <div key={name} style={{ backgroundColor: color }}>
-                      {name}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {palette && <PaletteDump palette={palette} />}
             </div>
           </article>
         ) : null}

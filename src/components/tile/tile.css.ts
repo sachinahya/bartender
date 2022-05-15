@@ -4,6 +4,12 @@ import { vars } from '../../theme';
 
 export const backgroundColorVar = createVar();
 
+const aspectRatio = style({
+  aspectRatio: '1/1',
+});
+
+export const skeleton = aspectRatio;
+
 export const root = style({
   display: 'grid',
   alignItems: 'center',
@@ -12,9 +18,12 @@ export const root = style({
   backgroundColor: backgroundColorVar,
 });
 
-export const img = style({
-  inlineSize: '100%',
-});
+export const img = style([
+  aspectRatio,
+  {
+    inlineSize: '100%',
+  },
+]);
 
 export const header = style({});
 

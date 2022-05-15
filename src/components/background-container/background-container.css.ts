@@ -2,12 +2,14 @@ import { createVar, style } from '@vanilla-extract/css';
 
 import { vars } from '../../theme';
 
-export const backgroundImageVar = createVar();
-export const backgroundMaxHeightVar = createVar();
+export const containerMinHeightVar = createVar('container');
+export const backgroundImageVar = createVar('image');
+export const backgroundMaxHeightVar = createVar('height');
 
 export const root = style({
   position: 'relative',
   overflow: 'hidden',
+  minBlockSize: containerMinHeightVar,
 
   '::before': {
     content: '""',

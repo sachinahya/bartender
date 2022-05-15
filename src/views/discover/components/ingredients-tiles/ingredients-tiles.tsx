@@ -1,13 +1,14 @@
-import { FC, HTMLAttributes } from 'react';
+import { FC } from 'react';
+import type { Except } from 'type-fest';
 
 import { useIngredientsQuery } from '../../../../api/cocktail-db';
-import { Tile, Tiles } from '../../../../components/tile';
+import { Tile, Tiles, TilesProps } from '../../../../components/tile';
 import { Ingredient } from '../../../../entities';
 import { useCallbackRef, usePalette } from '../../../../utils';
 
 import * as styles from './ingredients-tiles.css';
 
-export interface IngredientsTilesProps extends HTMLAttributes<HTMLElement> {}
+export interface IngredientsTilesProps extends Except<TilesProps, 'children'> {}
 
 const IngredientTile: FC<{ ingredient: Ingredient }> = ({ ingredient }) => {
   const [imageRef, setImageRef] = useCallbackRef<HTMLImageElement>();
@@ -39,7 +40,7 @@ export const IngredientsTiles: FC<IngredientsTilesProps> = (props) => {
   const { data: ingredients = [] } = useIngredientsQuery();
 
   return (
-    <Tiles variant="grid" {...props}>
+    <Tiles {...props}>
       {ingredients.map((ingredient) => (
         <IngredientTile key={ingredient.name} ingredient={ingredient} />
       ))}
