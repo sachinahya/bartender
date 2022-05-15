@@ -6,7 +6,8 @@ import {
   useQuery,
   useQueryClient,
   UseQueryOptions,
-  UseQueryResult,
+  QueryObserverRefetchErrorResult,
+  QueryObserverSuccessResult,
 } from 'react-query';
 import type { Except } from 'type-fest';
 
@@ -17,6 +18,20 @@ export type KeyId = string;
 export type SimpleQueryKey = readonly [KeyId];
 
 export type ParameterizedQueryKey<P extends Params> = readonly [KeyId, P];
+
+export type Loader = LoaderFn;
+
+const loaderKeyKey = Symbol();
+
+type KeyedLoader = LoaderFn & { [loaderKeyKey]: symbol };
+
+const combinedLoadersKey = Symbol();
+
+type CombinedLoader = LoaderFn & { [combinedLoadersKey]: KeyedLoader[] };
+
+export type UseQueryResult<R> =
+  | QueryObserverRefetchErrorResult<R, Error>
+  | QueryObserverSuccessResult<R, Error>;
 
 export type UseDataQueryOptions<
   K extends SimpleQueryKey | ParameterizedQueryKey<Params>,
@@ -56,28 +71,66 @@ export interface GenerateQueryOptionsWithParams<P extends Params, R, C>
   loaderOptions?: FetchDataOptions<ParameterizedQueryKey<P>, R>;
 }
 
-export interface GeneratedNoParams<R> {
-  getKey: () => SimpleQueryKey;
-  // fetchData: () => Promise<R>;
-  useDataQuery: (options?: UseDataQueryOptions<SimpleQueryKey, R>) => UseQueryResult<R, Error>;
-  useLoader: () => LoaderFn;
+export interface LoaderFactoryOptions {
+  eager?: boolean;
 }
 
-export interface GeneratedWithParams<P extends Params, R> {
+export interface CommonGenerated {
+  useLoader: (options?: LoaderFactoryOptions) => Loader;
+}
+
+export interface GeneratedNoParams<R> extends CommonGenerated {
+  getKey: () => SimpleQueryKey;
+  // fetchData: () => Promise<R>;
+  useDataQuery: (options?: UseDataQueryOptions<SimpleQueryKey, R>) => UseQueryResult<R>;
+}
+
+export interface GeneratedWithParams<P extends Params, R> extends CommonGenerated {
   getKey: (params: P) => ParameterizedQueryKey<P>;
   // fetchData: (params: P) => Promise<R>;
   useDataQuery: (
     params: P,
     options?: UseDataQueryOptions<ParameterizedQueryKey<P>, R>,
-  ) => UseQueryResult<R, Error>;
+  ) => UseQueryResult<R>;
   useRouteMatchedDataQuery: (
     options?: UseDataQueryOptions<ParameterizedQueryKey<P>, R>,
-  ) => UseQueryResult<R, Error>;
-  useLoader: () => LoaderFn;
+  ) => UseQueryResult<R>;
 }
+
+export const combineLoaders = (...loaders: Loader[]): CombinedLoader => {
+  const combinedLoader: CombinedLoader = (async (match, opts) => {
+    const promises = loaders.map((loader) => loader(match, opts));
+    await Promise.all(promises);
+    return {};
+  }) as CombinedLoader;
+
+  Object.assign(combinedLoader, {
+    [combinedLoadersKey]: loaders,
+    [loaderKeyKey]: Symbol(),
+  });
+
+  return combinedLoader;
+};
 
 const defaultContextThing = {};
 const defaultContextFn = () => defaultContextThing;
+
+const getRefetchOnMount = (
+  functionKey: symbol,
+  loader: Loader | CombinedLoader | undefined,
+): false | undefined => {
+  const ourLoader = loader as Loader | CombinedLoader;
+
+  if (combinedLoadersKey in ourLoader) {
+    const combinedLoaders = (ourLoader as CombinedLoader)[combinedLoadersKey];
+    return combinedLoaders.some((loader) => loader[loaderKeyKey] === functionKey)
+      ? false
+      : undefined;
+  }
+
+  const singleLoader = loader as KeyedLoader;
+  return singleLoader[loaderKeyKey] === functionKey ? false : undefined;
+};
 
 export function generateQuery<R, C>(
   options: GenerateQueryOptionsNoParams<R, C>,
@@ -92,43 +145,57 @@ export function generateQuery<P extends Params, R, C>(
 
   const useQueryContextMeta = options.useQueryContextMeta || defaultContextFn;
 
+  const functionKey = Symbol();
+
   if ('getMatchParams' in options) {
     type Result = GeneratedWithParams<P, R>;
     const { key, fetcher, getMatchParams, commonOptions, loaderOptions } = options;
 
     const getKey: Result['getKey'] = (params) => [key, params];
 
-    const useLoader: Result['useLoader'] = () => {
+    const useLoader: Result['useLoader'] = ({ eager } = {}) => {
       const queryClient = useQueryClient();
       const meta = useQueryContextMeta();
 
-      return async (match) => {
+      const loader: Loader = async (match) => {
         const params = getMatchParams(match);
 
-        if (params) {
-          await queryClient.prefetchQuery(
-            getKey(params),
-            (context) => fetcher(params, context as never),
-            {
-              ...commonOptions,
-              ...loaderOptions,
-              meta,
-            },
-          );
+        if (!params) {
+          return {};
+        }
+
+        const promise = queryClient.prefetchQuery(
+          getKey(params),
+          (context) => fetcher(params, context as never),
+          {
+            ...commonOptions,
+            ...loaderOptions,
+            meta,
+          },
+        );
+
+        if (!eager) {
+          await promise;
         }
 
         return {};
       };
+
+      (loader as KeyedLoader)[loaderKeyKey] = functionKey;
+
+      return loader;
     };
 
     const useDataQuery: Result['useDataQuery'] = (params, options) => {
       const meta = useQueryContextMeta();
+      const { route } = useMatch();
 
       return useQuery(getKey(params), (context) => fetcher(params, context as never), {
+        refetchOnMount: getRefetchOnMount(functionKey, route.loader),
         ...commonOptions,
         ...options,
         meta,
-      });
+      }) as UseQueryResult<R>;
     };
 
     const useRouteMatchedDataQuery: Result['useRouteMatchedDataQuery'] = (options) => {
@@ -150,29 +217,39 @@ export function generateQuery<P extends Params, R, C>(
 
   const getKey: Result['getKey'] = () => [key];
 
-  const useLoader: Result['useLoader'] = () => {
+  const useLoader: Result['useLoader'] = ({ eager } = {}) => {
     const queryClient = useQueryClient();
     const meta = useQueryContextMeta();
 
-    return async () => {
-      await queryClient.prefetchQuery(getKey(), (context) => fetcher(context as never), {
+    const loader: Loader = async () => {
+      const promise = queryClient.prefetchQuery(getKey(), (context) => fetcher(context as never), {
         ...commonOptions,
         ...loaderOptions,
         meta,
       });
 
+      if (!eager) {
+        await promise;
+      }
+
       return {};
     };
+
+    (loader as KeyedLoader)[loaderKeyKey] = functionKey;
+
+    return loader;
   };
 
   const useDataQuery: Result['useDataQuery'] = (options) => {
     const meta = useQueryContextMeta();
+    const { route } = useMatch();
 
     return useQuery(getKey(), (context) => fetcher(context as never), {
+      refetchOnMount: getRefetchOnMount(functionKey, route.loader),
       ...commonOptions,
       ...options,
       meta,
-    });
+    }) as UseQueryResult<R>;
   };
 
   return {

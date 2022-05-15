@@ -14,8 +14,4 @@ export const { useDataQuery: useRandomDrinkQuery, useLoader: useRandomDrinkLoade
     return fetchSingleDrink(url);
   },
   useQueryContextMeta: useApiContext,
-  commonOptions: {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  },
 });

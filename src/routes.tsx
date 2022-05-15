@@ -1,14 +1,27 @@
 import { Route } from '@tanstack/react-location';
 
-import { useDrinkByIdLoader, useRandomDrinkLoader, useRandomDrinksLoader } from './api/cocktail-db';
+import {
+  useDrinkByIdLoader,
+  useIngredientsLoader,
+  useRandomDrinkLoader,
+  useRandomDrinksLoader,
+} from './api/cocktail-db';
 import { useFavouriteDrinksLoader } from './api/favourite-drinks';
-import { Discover } from './views/discover';
+import { combineLoaders } from './data';
+import { consoleTimer, delay } from './utils';
 
 export const useRoutes = (): Route[] => [
   {
     path: '/',
-    element: <Discover />,
-    loader: useRandomDrinksLoader(),
+    element: async () =>
+      consoleTimer('Fetching code', async () => {
+        await delay(2000);
+        return import('./views/discover').then(({ Discover }) => <Discover />);
+      }),
+    loader: combineLoaders(
+      useRandomDrinksLoader({ eager: true }),
+      useIngredientsLoader({ eager: false }),
+    ),
   },
   {
     path: 'favourites',

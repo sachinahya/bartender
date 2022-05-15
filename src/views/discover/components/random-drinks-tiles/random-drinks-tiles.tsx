@@ -9,7 +9,7 @@ export interface RandomDrinksTilesProps extends Except<TilesProps, 'children'> {
 }
 
 export const RandomDrinksTiles: FC<RandomDrinksTilesProps> = ({ count, ...props }) => {
-  const { data: drinks = [] } = useRandomDrinksQuery({ count });
+  const { data: drinks } = useRandomDrinksQuery({ count });
 
   return <DrinkTiles drinks={drinks} {...props} />;
 };

@@ -37,7 +37,7 @@ const IngredientTile: FC<{ ingredient: Ingredient }> = ({ ingredient }) => {
 };
 
 export const IngredientsTiles: FC<IngredientsTilesProps> = (props) => {
-  const { data: ingredients = [] } = useIngredientsQuery();
+  const { data: ingredients } = useIngredientsQuery();
 
   return (
     <Tiles {...props}>
