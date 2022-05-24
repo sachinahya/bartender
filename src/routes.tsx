@@ -8,19 +8,14 @@ import {
 } from './api/cocktail-db';
 import { useFavouriteDrinksLoader } from './api/favourite-drinks';
 import { combineLoaders } from './data';
-import { consoleTimer, delay } from './utils';
 
 export const useRoutes = (): Route[] => [
   {
     path: '/',
-    element: async () =>
-      consoleTimer('Fetching code', async () => {
-        await delay(2000);
-        return import('./views/discover').then(({ Discover }) => <Discover />);
-      }),
+    element: () => import('./views/discover').then(({ Discover }) => <Discover />),
     loader: combineLoaders(
       useRandomDrinksLoader({ eager: true }),
-      useIngredientsLoader({ eager: false }),
+      useIngredientsLoader({ eager: true }),
     ),
   },
   {
