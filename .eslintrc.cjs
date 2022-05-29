@@ -356,6 +356,9 @@ module.exports = {
         // https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/unbound-method.md#how-to-use
         '@typescript-eslint/unbound-method': 'off',
         'jest/unbound-method': 'error',
+
+        // Scoping within describe blocks can be better for test organisation.
+        'unicorn/consistent-function-scoping': 'off',
       },
     },
     {

@@ -115,22 +115,21 @@ export const combineLoaders = (...loaders: Loader[]): CombinedLoader => {
 const defaultContextThing = {};
 const defaultContextFn = () => defaultContextThing;
 
-const getRefetchOnMount = (
-  functionKey: symbol,
-  loader: Loader | CombinedLoader | undefined,
-): false | undefined => {
-  const ourLoader = loader as Loader | CombinedLoader;
+const makeGetRefetchOnMount =
+  (functionKey: symbol) =>
+  (routeMatchedLoader: Loader | CombinedLoader | undefined): false | undefined => {
+    const ourLoader = routeMatchedLoader as Loader | CombinedLoader;
 
-  if (combinedLoadersKey in ourLoader) {
-    const combinedLoaders = (ourLoader as CombinedLoader)[combinedLoadersKey];
-    return combinedLoaders.some((loader) => loader[loaderKeyKey] === functionKey)
-      ? false
-      : undefined;
-  }
+    if (combinedLoadersKey in ourLoader) {
+      const combinedLoaders = (ourLoader as CombinedLoader)[combinedLoadersKey];
+      return combinedLoaders.some((loader) => loader[loaderKeyKey] === functionKey)
+        ? false
+        : undefined;
+    }
 
-  const singleLoader = loader as KeyedLoader;
-  return singleLoader[loaderKeyKey] === functionKey ? false : undefined;
-};
+    const singleLoader = routeMatchedLoader as KeyedLoader;
+    return singleLoader[loaderKeyKey] === functionKey ? false : undefined;
+  };
 
 export function generateQuery<R, C>(
   options: GenerateQueryOptionsNoParams<R, C>,
@@ -146,6 +145,7 @@ export function generateQuery<P extends Params, R, C>(
   const useQueryContextMeta = options.useQueryContextMeta || defaultContextFn;
 
   const functionKey = Symbol();
+  const getRefetchOnMount = makeGetRefetchOnMount(functionKey);
 
   if ('getMatchParams' in options) {
     type Result = GeneratedWithParams<P, R>;
@@ -188,10 +188,8 @@ export function generateQuery<P extends Params, R, C>(
 
     const useDataQuery: Result['useDataQuery'] = (params, options) => {
       const meta = useQueryContextMeta();
-      const { route } = useMatch();
 
       return useQuery(getKey(params), (context) => fetcher(params, context as never), {
-        refetchOnMount: getRefetchOnMount(functionKey, route.loader),
         ...commonOptions,
         ...options,
         meta,
@@ -201,7 +199,11 @@ export function generateQuery<P extends Params, R, C>(
     const useRouteMatchedDataQuery: Result['useRouteMatchedDataQuery'] = (options) => {
       const match = useMatch();
       const params = getMatchParams(match);
-      return useDataQuery(params as P, { enabled: !!params, ...options });
+      return useDataQuery(params as P, {
+        enabled: !!params,
+        refetchOnMount: getRefetchOnMount(match.route.loader),
+        ...options,
+      });
     };
 
     return {
@@ -245,7 +247,7 @@ export function generateQuery<P extends Params, R, C>(
     const { route } = useMatch();
 
     return useQuery(getKey(), (context) => fetcher(context as never), {
-      refetchOnMount: getRefetchOnMount(functionKey, route.loader),
+      refetchOnMount: getRefetchOnMount(route.loader),
       ...commonOptions,
       ...options,
       meta,
