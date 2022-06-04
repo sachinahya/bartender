@@ -1,7 +1,7 @@
 import type { Config } from '@jest/types';
 
 const config: Config.InitialOptions = {
-  preset: 'ts-jest/presets/default-esm',
+  preset: 'ts-jest',
   globals: {
     'ts-jest': {
       isolatedModules: true,
@@ -17,8 +17,10 @@ const config: Config.InitialOptions = {
   coverageDirectory: '<rootDir>/coverage',
   coverageReporters: ['json', 'lcov', 'text', 'cobertura'],
   watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
-  setupFilesAfterEnv: ['jest-extended/all'],
+  setupFilesAfterEnv: ['jest-extended/all', './src/jest-setup.ts'],
   testEnvironment: 'jsdom',
+  resetMocks: true,
+  restoreMocks: true,
 };
 
 export default config;

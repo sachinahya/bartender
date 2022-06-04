@@ -118,10 +118,12 @@ const defaultContextFn = () => defaultContextThing;
 const makeGetRefetchOnMount =
   (functionKey: symbol) =>
   (routeMatchedLoader: Loader | CombinedLoader | undefined): false | undefined => {
-    const ourLoader = routeMatchedLoader as Loader | CombinedLoader;
+    if (!routeMatchedLoader) {
+      return undefined;
+    }
 
-    if (combinedLoadersKey in ourLoader) {
-      const combinedLoaders = (ourLoader as CombinedLoader)[combinedLoadersKey];
+    if (combinedLoadersKey in routeMatchedLoader) {
+      const combinedLoaders = (routeMatchedLoader as CombinedLoader)[combinedLoadersKey];
       return combinedLoaders.some((loader) => loader[loaderKeyKey] === functionKey)
         ? false
         : undefined;
@@ -199,6 +201,7 @@ export function generateQuery<P extends Params, R, C>(
     const useRouteMatchedDataQuery: Result['useRouteMatchedDataQuery'] = (options) => {
       const match = useMatch();
       const params = getMatchParams(match);
+
       return useDataQuery(params as P, {
         enabled: !!params,
         refetchOnMount: getRefetchOnMount(match.route.loader),
