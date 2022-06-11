@@ -256,3 +256,6 @@ cdk.out
 
 # VSCode settings
 .vscode/settings.json
+
+# Local Netlify folder
+.netlify

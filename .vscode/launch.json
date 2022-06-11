@@ -3,22 +3,5 @@
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Launch and Attach",
-      "type": "pwa-node",
-      "request": "attach",
-      "port": 9230,
-      "restart": true,
-      "sourceMaps": true,
-      "continueOnAttach": true,
-      "localRoot": "${workspaceFolder}/packages/api/dist",
-      "remoteRoot": "/var/task",
-      "skipFiles": ["<node_internals>/**", "/var/runtime/**", "**/node_modules/**"],
-      "outFiles": ["${workspaceFolder}/packages/api/dist/**/*.js", "!**/node_modules/**"],
-      "preLaunchTask": "dev-debug",
-      "postDebugTask": "dev-debug-terminate",
-      "timeout": 300000
-    }
-  ]
+  "configurations": []
 }
