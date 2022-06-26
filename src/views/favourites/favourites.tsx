@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useFavouriteDrinksQuery } from '../../api/favourite-drinks';
+import { useFavouriteDrinksQuery } from '../../api/queries/favourite-drinks';
 import { BackgroundContainer } from '../../components/background-container';
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';

@@ -5,8 +5,8 @@ import { Palette } from '../entities/palette';
 const cache = new Map<string, Palette>();
 const useCache = true;
 
-export const getPalette = async (image: string | HTMLImageElement): Promise<Palette> => {
-  const src = typeof image === 'string' ? image : image.src;
+export const getPalette = async (image: string | URL): Promise<Palette> => {
+  const src = typeof image === 'string' ? image : image.toString();
 
   if (useCache) {
     const cacheResult = cache.get(src);
@@ -16,7 +16,7 @@ export const getPalette = async (image: string | HTMLImageElement): Promise<Pale
     }
   }
 
-  const vibrant = new Vibrant(image);
+  const vibrant = new Vibrant(src);
   const palette = await vibrant.getPalette();
 
   const result: Palette = {};

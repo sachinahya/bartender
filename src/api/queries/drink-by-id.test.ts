@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 
-import * as fetchJson from '../../../data/fetch-json';
-import { delay } from '../../../utils';
+import * as fetchJson from '../../data/fetch-json';
+import { delay } from '../../utils';
 
 import { useDrinkQuery, useMatchedDrinkQuery } from './drink-by-id';
 import { createWrapper, MockQueryClient } from './test-helpers';

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { getPalette, Palette } from './get-palette';
+import { Palette } from '../entities/palette';
+
+import { getPalette } from './get-palette';
 
 export interface UsePaletteHook {
   palette?: Palette;

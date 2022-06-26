@@ -1,9 +1,9 @@
 import { useMatch } from '@tanstack/react-location';
 import { assignInlineVars } from '@vanilla-extract/dynamic';
 import { FC } from 'react';
-import mergeRefs from 'react-merge-refs';
 
-import { useMatchedDrinkQuery, useRandomDrinkQuery } from '../../api/cocktail-db';
+import { useMatchedDrinkQuery } from '../../api/queries/drink-by-id';
+import { useRandomDrinkQuery } from '../../api/queries/random-drink';
 import {
   Banner,
   BannerBackAction,
@@ -14,7 +14,7 @@ import {
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
 import { PaletteDump } from '../../components/palette-dump';
-import { useCallbackRef, usePalette, useParallax } from '../../utils';
+import { useParallax } from '../../utils';
 
 import { FavouriteBannerAction } from './components/favourite-banner-action';
 import * as styles from './drink.css';
@@ -31,9 +31,6 @@ export const Drink: FC = () => {
   const drink = drinkById || randomDrink;
 
   const parallaxRef = useParallax(6);
-  const [imageRef, setImageRef] = useCallbackRef<HTMLImageElement>();
-
-  const { palette } = usePalette(imageRef);
 
   return (
     <Layout>
@@ -50,8 +47,8 @@ export const Drink: FC = () => {
           <article
             className={styles.root}
             style={assignInlineVars({
-              [styles.darkVibrantVar]: palette?.darkVibrant || '',
-              [styles.lightMutedVar]: palette?.lightMuted || '',
+              [styles.darkVibrantVar]: drink.palette?.darkVibrant || '',
+              [styles.lightMutedVar]: drink.palette?.lightMuted || '',
             })}
           >
             <header className={styles.header}>
@@ -63,7 +60,7 @@ export const Drink: FC = () => {
             <img
               src={drink.image}
               className={styles.image}
-              ref={mergeRefs([parallaxRef, setImageRef])}
+              ref={parallaxRef}
               crossOrigin="anonymous"
             />
 
@@ -120,7 +117,7 @@ export const Drink: FC = () => {
                 </>
               )}
 
-              {palette && <PaletteDump palette={palette} />}
+              {drink.palette && <PaletteDump palette={drink.palette} />}
             </div>
           </article>
         ) : null}

@@ -5,7 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
-import { FavouritesStoreProvider, LocalStorageFavouritesStore } from './api/favourite-drinks';
+import { ApiClient, ApiClientProvider } from './api/client';
 import { ErrorMessage } from './components/error-message';
 import { LoadingView } from './components/layout';
 import { useRoutes } from './routes';
@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
 });
 const location = new ReactLocation();
 
-const favouritesStore = new LocalStorageFavouritesStore();
+const apiClient = new ApiClient();
 
 const Routes: FC = () => {
   const routes = useRoutes();
@@ -57,10 +57,10 @@ export const App: FC = () => {
         scope={import.meta.env.VITE_SCOPE}
       >
         <QueryClientProvider client={queryClient}>
-          <FavouritesStoreProvider store={favouritesStore}>
+          <ApiClientProvider value={apiClient}>
             <ReactQueryDevtools />
             <Routes />
-          </FavouritesStoreProvider>
+          </ApiClientProvider>
         </QueryClientProvider>
       </Auth0Provider>
     </StrictMode>

@@ -1,9 +1,9 @@
 import { useMutation, UseMutationResult, useQueryClient } from 'react-query';
 
-import { Drink } from '../../../entities';
-import { getFavouriteDrinksKey } from '../queries/get-favourite-drinks';
+import { Drink } from '../../entities';
+import { useApiClient } from '../client';
+import { getFavouriteDrinksKey } from '../queries/favourite-drinks';
 import { useIsFavouriteDrinkQuery, getIsFavouriteDrinkKey } from '../queries/is-favourite-drink';
-import { LocalStorageFavouritesStore } from '../store/local-storage-favourites-store';
 
 export const useFavouriteDrinkToggle = ({
   drink,
@@ -11,6 +11,7 @@ export const useFavouriteDrinkToggle = ({
   drink: Drink;
 }): UseMutationResult<void, Error> => {
   const queryClient = useQueryClient();
+  const apiClient = useApiClient();
 
   const { data: isFavourite } = useIsFavouriteDrinkQuery({ id: drink.id });
 
@@ -22,8 +23,7 @@ export const useFavouriteDrinkToggle = ({
         throw new Error('Drink not loaded yet');
       }
 
-      const store = new LocalStorageFavouritesStore();
-      await (isFavourite ? store.remove(drink.id) : store.add(drink));
+      await (isFavourite ? apiClient.remove(drink.id) : apiClient.add(drink));
     },
     {
       onMutate: async () => {
@@ -40,7 +40,8 @@ export const useFavouriteDrinkToggle = ({
         }
       },
       onSettled: async () => {
-        await queryClient.invalidateQueries(key);
+        queryClient.setQueryData(key, !isFavourite);
+        // await queryClient.invalidateQueries(key);
         await queryClient.invalidateQueries(getFavouriteDrinksKey());
       },
     },

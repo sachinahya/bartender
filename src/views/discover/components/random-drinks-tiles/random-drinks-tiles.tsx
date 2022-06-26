@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import type { Except } from 'type-fest';
 
-import { useRandomDrinksQuery } from '../../../../api/cocktail-db';
+import { useRandomDrinksQuery } from '../../../../api/queries/random-drinks';
 import { DrinkTiles, TilesProps } from '../../../../components/tile';
 
 export interface RandomDrinksTilesProps extends Except<TilesProps, 'children'> {

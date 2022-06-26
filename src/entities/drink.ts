@@ -1,3 +1,5 @@
+import { Palette } from './palette';
+
 export interface Drink {
   id: string;
   name: string;
@@ -6,6 +8,7 @@ export interface Drink {
   category: string;
   alcoholic: string;
   glass: string;
+  palette?: Palette;
   image: string;
   instructions: string[];
   ingredients: DrinkIngredient[];

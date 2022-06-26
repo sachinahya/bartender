@@ -1,21 +1,23 @@
-import { fetchJson } from '../../../data';
-import { Drink } from '../../../entities';
-import { responseToEntity } from '../mapping';
-import { CocktailApiResponse, DrinksResponseItem } from '../response';
+import { Drink } from '../../entities';
+import { fetchJson } from '../fetch-json';
+
+import { responseToEntity } from './mapping';
+import { CocktailApiResponse, DrinksResponseItem } from './response';
+
+const token = process.env.COCKTAIL_DB_TOKEN || '';
 
 export const getImagesUrl = (): URL => new URL('https://www.thecocktaildb.com/images');
 
-export const getBaseUrl = (token: string): URL =>
-  new URL(`https://www.thecocktaildb.com/api/json/v1/${token}`);
+export const getBaseUrl = (): URL => new URL(`https://www.thecocktaildb.com/api/json/v1/${token}`);
 
-export const getLookupUrl = (token: string): URL => {
-  const url = getBaseUrl(token);
+export const getLookupUrl = (): URL => {
+  const url = getBaseUrl();
   url.pathname += '/lookup.php';
   return url;
 };
 
-export const getListUrl = (token: string, type: string): URL => {
-  const url = getBaseUrl(token);
+export const getListUrl = (type: string): URL => {
+  const url = getBaseUrl();
   url.pathname += '/list.php';
   url.searchParams.set(type, 'list');
   return url;
@@ -39,12 +41,4 @@ export const fetchList = async <T, R>(
   const response = await fetchJson<CocktailApiResponse<T>>(url.toString());
   const transformPromises = response.drinks.map((item) => Promise.resolve(transformer(item)));
   return Promise.all(transformPromises);
-};
-
-export interface CocktailApiContext {
-  token: string;
-}
-
-export const useApiContext = (): CocktailApiContext => {
-  return { token: '1' };
 };

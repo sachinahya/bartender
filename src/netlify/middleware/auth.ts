@@ -4,6 +4,10 @@ import jwksClient from 'jwks-rsa';
 
 import { Middleware } from './common';
 
+export interface AuthMiddlewareOptions {
+  optional?: boolean;
+}
+
 const client = jwksClient({
   jwksUri: `https://${process.env.VITE_DOMAIN || ''}/.well-known/jwks.json`,
 });
@@ -20,7 +24,7 @@ const verify = (token: string, secret: string, options: VerifyOptions): Promise<
   });
 };
 
-export const authMiddleware = (): Middleware => {
+export const auth = ({ optional }: AuthMiddlewareOptions = {}): Middleware => {
   return {
     before: async ({ event }) => {
       if (event.httpMethod.toUpperCase() !== 'OPTIONS') {
@@ -29,32 +33,34 @@ export const authMiddleware = (): Middleware => {
           '',
         );
 
-        if (!token) {
+        if (!token && !optional) {
           throw new Unauthorized('No token supplied');
         }
 
-        const decodedToken = jwt.decode(token, { complete: true });
-        const kid = decodedToken?.header.kid;
+        if (token) {
+          const decodedToken = jwt.decode(token, { complete: true });
+          const kid = decodedToken?.header.kid;
 
-        if (!kid) {
-          throw new Unauthorized('No kid present on token');
-        }
+          if (!kid) {
+            throw new Unauthorized('No kid present on token');
+          }
 
-        const secret = await client.getSigningKey(kid);
-        const publicKey = secret.getPublicKey();
+          const secret = await client.getSigningKey(kid);
+          const publicKey = secret.getPublicKey();
 
-        try {
-          const { payload } = await verify(token, publicKey, {
-            audience: process.env.VITE_AUDIENCE,
-            issuer: `https://${process.env.VITE_DOMAIN || ''}/`,
-            algorithms: ['RS256'],
-          });
+          try {
+            const { payload } = await verify(token, publicKey, {
+              audience: process.env.VITE_AUDIENCE,
+              issuer: `https://${process.env.VITE_DOMAIN || ''}/`,
+              algorithms: ['RS256'],
+            });
 
-          event.auth = payload as jwt.JwtPayload;
-        } catch (error) {
-          // eslint-disable-next-line no-console -- Captured by Netlify logs.
-          console.error(error);
-          throw new Unauthorized('JWT validation failed');
+            event.auth = payload as jwt.JwtPayload;
+          } catch (error) {
+            // eslint-disable-next-line no-console -- Captured by Netlify logs.
+            console.error(error);
+            throw new Unauthorized('JWT validation failed');
+          }
         }
       }
     },
