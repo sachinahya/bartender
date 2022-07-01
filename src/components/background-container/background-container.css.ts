@@ -28,7 +28,7 @@ export const root = style({
     position: 'absolute',
     inset: 0,
     zIndex: -1,
-    backgroundImage: `linear-gradient(180deg, ${vars.colors.whiteAlpha[100]} 10%, ${vars.colors.whiteAlpha[400]} 30%, ${vars.colors.white})`,
+    backgroundImage: `linear-gradient(to bottom, ${vars.colors.whiteAlpha[500]} 0%, ${vars.colors.whiteAlpha[800]} 70%, ${vars.colors.white} 100%)`,
   },
 });
 

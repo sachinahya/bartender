@@ -3,13 +3,13 @@ import type { Except } from 'type-fest';
 
 import { useIngredientsQuery } from '../../../../api/queries/list-ingredients';
 import { Tile, Tiles, TilesProps } from '../../../../components/tile';
-import { Ingredient } from '../../../../entities';
+import { IngredientListItem } from '../../../../entities';
 
 import * as styles from './ingredients-tiles.css';
 
 export interface IngredientsTilesProps extends Except<TilesProps, 'children'> {}
 
-const IngredientTile: FC<{ ingredient: Ingredient }> = ({ ingredient }) => {
+const IngredientTile: FC<{ ingredient: IngredientListItem }> = ({ ingredient }) => {
   return (
     <Tile
       key={ingredient.name}
@@ -25,7 +25,7 @@ const IngredientTile: FC<{ ingredient: Ingredient }> = ({ ingredient }) => {
           className={styles.image}
         />
       }
-      href=""
+      href={`/ingredient/${ingredient.name}`}
       backgroundColor={ingredient.palette?.lightVibrant}
     />
   );

@@ -1,7 +1,7 @@
 import { createContext, FC, ReactNode, useContext } from 'react';
 
 import { fetchJson } from '../data';
-import { Category, Drink, Ingredient } from '../entities';
+import { Category, Drink, DrinkListItem, Ingredient, IngredientListItem } from '../entities';
 
 const ApiClientContext = createContext<ApiClient | undefined>(undefined);
 
@@ -51,12 +51,20 @@ export class ApiClient {
     return this.#callFunction('drink-by-id', { id });
   }
 
+  getDrinksByIngredient(ingredientName: string): Promise<DrinkListItem[]> {
+    return this.#callFunction('drinks-by-ingredient', { ingredientName });
+  }
+
   getCategories(): Promise<Category[]> {
     return this.#callFunction('list-categories');
   }
 
-  getIngredients(): Promise<Ingredient[]> {
+  getIngredients(): Promise<IngredientListItem[]> {
     return this.#callFunction('list-ingredients');
+  }
+
+  getIngredientByName(name: string): Promise<Ingredient> {
+    return this.#callFunction('ingredient-by-name', { name });
   }
 
   #callFunction<T>(functionName: string, params?: Record<string, string>) {

@@ -1,15 +1,19 @@
 import { Palette } from './palette';
 
-export interface Drink {
+export interface DrinkListItem {
   id: string;
   name: string;
+  image: string;
+  palette?: Palette;
+}
+
+export interface Drink extends DrinkListItem {
   alternateName?: string;
   tags: string[];
   category: string;
   alcoholic: string;
   glass: string;
-  palette?: Palette;
-  image: string;
+
   instructions: string[];
   ingredients: DrinkIngredient[];
 }

@@ -1,6 +1,6 @@
 import { Palette } from './palette';
 
-export interface Ingredient {
+export interface IngredientListItem {
   name: string;
   palette?: Palette;
   images: {
@@ -8,4 +8,12 @@ export interface Ingredient {
     350: string;
     700: string;
   };
+}
+
+export interface Ingredient extends IngredientListItem {
+  id: string;
+  description: string;
+  type: string;
+  alcoholic: string;
+  abv?: string;
 }

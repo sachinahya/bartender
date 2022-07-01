@@ -9,9 +9,13 @@ import { middleware } from '../middleware/middleware';
 const listCategories: Handler = async () => {
   const url = getListUrl('c');
 
-  const result = await fetchList<CategoriesResponseItem, Category>(url, (category) => ({
-    name: category.strCategory,
-  }));
+  const result = await fetchList(
+    'drinks',
+    url,
+    (category: CategoriesResponseItem): Category => ({
+      name: category.strCategory,
+    }),
+  );
 
   return {
     statusCode: StatusCodes.OK,

@@ -17,5 +17,6 @@ export const fetchJson = async <T>(input: RequestInfo, init?: RequestInit): Prom
     throw new FetchError(response);
   }
 
-  return response.json() as Promise<T>;
+  const json = (await response.json()) as T;
+  return json;
 };

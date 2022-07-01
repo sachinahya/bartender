@@ -23,6 +23,18 @@ export const getListUrl = (type: string): URL => {
   return url;
 };
 
+export const getFilterUrl = (): URL => {
+  const url = getBaseUrl();
+  url.pathname += '/filter.php';
+  return url;
+};
+
+export const getSearchUrl = (): URL => {
+  const url = getBaseUrl();
+  url.pathname += '/search.php';
+  return url;
+};
+
 export const fetchSingleDrink = async (url: URL): Promise<Drink> => {
   const response = await fetchJson<CocktailApiResponse<DrinksResponseItem>>(url.toString());
   const [drinkJson] = response.drinks;
@@ -34,11 +46,27 @@ export const fetchSingleDrink = async (url: URL): Promise<Drink> => {
   return responseToEntity(drinkJson);
 };
 
-export const fetchList = async <T, R>(
+export const fetchSingleItem = async <T, R, K extends string>(
+  arrayKey: K,
+  url: URL,
+  transformer: (item: T) => R | Promise<R>,
+): Promise<R> => {
+  const response = await fetchJson<CocktailApiResponse<T, K>>(url.toString());
+  const [drinkJson] = response[arrayKey];
+
+  if (!drinkJson) {
+    throw new Error('Unexpected response.');
+  }
+
+  return transformer(drinkJson);
+};
+
+export const fetchList = async <T, R, K extends string = 'drinks'>(
+  arrayKey: K,
   url: URL,
   transformer: (item: T) => R | Promise<R>,
 ): Promise<R[]> => {
-  const response = await fetchJson<CocktailApiResponse<T>>(url.toString());
-  const transformPromises = response.drinks.map((item) => Promise.resolve(transformer(item)));
+  const response = await fetchJson<CocktailApiResponse<T, K>>(url.toString());
+  const transformPromises = response[arrayKey].map((item) => Promise.resolve(transformer(item)));
   return Promise.all(transformPromises);
 };

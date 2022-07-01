@@ -13,6 +13,7 @@ import {
 } from '../../components/banner';
 import { Heading } from '../../components/heading';
 import { Footer, Layout, Main } from '../../components/layout';
+import { Link } from '../../components/link';
 import { PaletteDump } from '../../components/palette-dump';
 import { useParallax } from '../../utils';
 
@@ -47,6 +48,7 @@ export const Drink: FC = () => {
           <article
             className={styles.root}
             style={assignInlineVars({
+              [styles.vibrantVar]: drink.palette?.vibrant || '',
               [styles.darkVibrantVar]: drink.palette?.darkVibrant || '',
               [styles.lightMutedVar]: drink.palette?.lightMuted || '',
             })}
@@ -70,7 +72,11 @@ export const Drink: FC = () => {
                   {drink.ingredients.map(({ measure, name }) => (
                     <li key={`${measure}-${name}`} className={styles.ingredientItem}>
                       <span className={styles.ingredientMeasure}>{measure}</span>
-                      <span className={styles.ingredientName}>{name}</span>
+                      <span className={styles.ingredientName}>
+                        <Link to={`/ingredient/${name}`} className={styles.ingredientLink}>
+                          {name}
+                        </Link>
+                      </span>
                     </li>
                   ))}
                 </ul>

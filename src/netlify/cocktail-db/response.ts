@@ -1,6 +1,6 @@
-export interface CocktailApiResponse<T> {
-  drinks: T[];
-}
+export type CocktailApiResponse<T, K extends string = 'drinks'> = {
+  [_ in K]: T[];
+};
 
 export interface CategoriesResponseItem {
   strCategory: string;
@@ -10,9 +10,13 @@ export interface IngredientsResponseItem {
   strIngredient1: string;
 }
 
-export interface DrinksResponseItem {
+export interface DrinksResponseListItem {
   idDrink: string;
   strDrink: string;
+  strDrinkThumb: string;
+}
+
+export interface DrinksResponseItem extends DrinksResponseListItem {
   strDrinkAlternate: null;
   strTags: string | null;
   strVideo: string | null;
@@ -27,7 +31,6 @@ export interface DrinksResponseItem {
   strInstructionsIT: string | null;
   'strInstructionsZH-HANS': string | null;
   'strInstructionsZH-HANT': string | null;
-  strDrinkThumb: string;
   strIngredient1: string | null;
   strIngredient2: string | null;
   strIngredient3: string | null;
@@ -62,4 +65,17 @@ export interface DrinksResponseItem {
   strImageAttribution: string | null;
   strCreativeCommonsConfirmed: string | null;
   dateModified: string | null;
+}
+
+export interface IngredientResponse {
+  ingredients: IngredientResponseItem[];
+}
+
+export interface IngredientResponseItem {
+  idIngredient: string;
+  strIngredient: string;
+  strDescription: string;
+  strType: string;
+  strAlcohol: string;
+  strABV: string | null;
 }

@@ -2,7 +2,7 @@ import { assignInlineVars } from '@vanilla-extract/dynamic';
 import clsx from 'clsx';
 import { FC, HTMLAttributes } from 'react';
 
-import { Palette } from '../../utils';
+import { Palette } from '../../entities/palette';
 
 import * as styles from './palette-dump.css';
 

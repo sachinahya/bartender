@@ -6,6 +6,7 @@ export const {
   getKey: getIsFavouriteDrinkKey,
   useDataQuery: useIsFavouriteDrinkQuery,
   useRouteMatchedDataQuery: useIsMatchedFavouriteDrinkQuery,
+  useLoader: useIsFavouriteDrinkLoader,
 } = generateQuery<{ id: string }, boolean, ApiContext>({
   key: 'favouriteDrink',
   fetcher: ({ id }, context) => context.meta.store.isFavourite(id),

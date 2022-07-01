@@ -1,7 +1,52 @@
-import { Drink, DrinkIngredient } from '../../entities';
+import { Drink, DrinkIngredient, Ingredient, IngredientListItem } from '../../entities';
 import { getPalette } from '../get-palette';
 
-import { DrinksResponseItem } from './response';
+import { getImagesUrl } from './api';
+import { DrinksResponseItem, IngredientResponseItem, IngredientsResponseItem } from './response';
+
+const createIngredientMapper =
+  <T>(nameSelector: (item: T) => string) =>
+  async (item: T): Promise<IngredientListItem> => {
+    const name = nameSelector(item);
+
+    const imageUrl700 = getImagesUrl();
+    imageUrl700.pathname += `/ingredients/${encodeURIComponent(name)}.png`;
+    const imageUrl350 = getImagesUrl();
+    imageUrl350.pathname += `/ingredients/${encodeURIComponent(name)}-Medium.png`;
+    const imageUrl100 = getImagesUrl();
+    imageUrl100.pathname += `/ingredients/${encodeURIComponent(name)}-Small.png`;
+
+    return {
+      name,
+      palette: await getPalette(imageUrl700),
+      images: {
+        100: imageUrl100.toString(),
+        350: imageUrl350.toString(),
+        700: imageUrl700.toString(),
+      },
+    };
+  };
+
+export const mapIngredientsListItem = createIngredientMapper<IngredientsResponseItem>(
+  (item) => item.strIngredient1,
+);
+
+const mapIngredientListItem = createIngredientMapper<IngredientResponseItem>(
+  (item) => item.strIngredient,
+);
+
+export const mapIngredientItem = async (item: IngredientResponseItem): Promise<Ingredient> => {
+  const ingredientListItem = await mapIngredientListItem(item);
+
+  return {
+    ...ingredientListItem,
+    id: item.idIngredient,
+    description: item.strDescription,
+    type: item.strType,
+    alcoholic: item.strAlcohol,
+    abv: item.strABV || undefined,
+  };
+};
 
 export const responseToEntity = async (item: DrinksResponseItem): Promise<Drink> => {
   const ingredients: DrinkIngredient[] = [

@@ -1,13 +1,13 @@
 import { FC } from 'react';
 import type { Except } from 'type-fest';
 
-import { Drink } from '../../entities';
+import { Drink, DrinkListItem } from '../../entities';
 
 import { Tile, TileProps } from './tile';
 import { Tiles, TilesProps } from './tiles';
 
 interface DrinkTileProps extends Partial<TileProps> {
-  drink: Drink;
+  drink: DrinkListItem & Partial<Pick<Drink, 'category'>>;
 }
 
 const DrinkTile: FC<DrinkTileProps> = ({ drink, ...props }) => {
@@ -24,7 +24,7 @@ const DrinkTile: FC<DrinkTileProps> = ({ drink, ...props }) => {
 };
 
 export interface DrinkTilesProps extends Except<TilesProps, 'children'> {
-  drinks: Drink[];
+  drinks: (DrinkListItem & Partial<Pick<Drink, 'category'>>)[];
 }
 
 export const DrinkTiles: FC<DrinkTilesProps> = ({ drinks, ...props }) => {

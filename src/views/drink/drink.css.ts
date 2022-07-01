@@ -3,6 +3,7 @@ import { createVar, style } from '@vanilla-extract/css';
 import { listReset } from '../../styles/utility.css';
 import { vars } from '../../theme';
 
+export const vibrantVar = createVar();
 export const lightMutedVar = createVar();
 export const darkVibrantVar = createVar();
 
@@ -68,6 +69,16 @@ export const ingredientMeasure = style({
   color: vars.colors.blackAlpha[600],
   order: 2,
   fontSize: vars.fontSizes.md,
+});
+
+export const ingredientLink = style({
+  color: vars.colors.black,
+  textDecoration: 'none',
+
+  ':hover': {
+    color: vibrantVar,
+    textDecoration: 'underline',
+  },
 });
 
 export const instructions = style([

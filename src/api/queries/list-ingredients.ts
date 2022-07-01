@@ -1,10 +1,10 @@
 import { generateQuery } from '../../data';
-import { Ingredient } from '../../entities';
+import { IngredientListItem } from '../../entities';
 
 import { ApiContext, useApiContext } from './context';
 
 export const { useDataQuery: useIngredientsQuery, useLoader: useIngredientsLoader } = generateQuery<
-  Ingredient[],
+  IngredientListItem[],
   ApiContext
 >({
   key: 'ingredients',
